@@ -60,9 +60,9 @@ const VerticalMenu = ({ scrollMenu }) => {
         {verticalMenuData().map((menu, index) => {
           if (menu?.children?.length > 0) {
             return (
-              <SubMenu label={menu.label} icon={<i className={menu.icon} />}>
+              <SubMenu key={index} label={menu.label} icon={<i className={menu.icon} />}>
                 {menu?.children.map((submenu, subindex) => (
-                  <MenuItem index={subindex} href={submenu.href}>
+                  <MenuItem key={subindex} index={subindex} href={submenu.href}>
                     {submenu.label}
                   </MenuItem>
                 ))}

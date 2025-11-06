@@ -1,42 +1,24 @@
 'use client'
 
-// React Imports
 import { useState, useEffect } from 'react'
 
-// Next Imports
 import Link from 'next/link'
 
-// MUI Imports
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 
-// Third-party Imports
 import classnames from 'classnames'
 
-// Hook Imports
-import { useImageVariant } from '@core/hooks/useImageVariant'
-
-// Styles Imports
 import styles from './styles.module.css'
 import frontCommonStyles from '@/components/section/home/styles.module.css'
 
-const HeroSection = ({ mode }) => {
-  // States
+const HeroSection = () => {
   const [dashboardPosition, setDashboardPosition] = useState({ x: 0, y: 0 })
   const [elementsPosition, setElementsPosition] = useState({ x: 0, y: 0 })
 
-  // Vars
-  const dashboardImageLight = '/images/front-pages/landing-page/hero-dashboard-light.png'
   const dashboardImageDark = '/images/front-pages/landing-page/hero-dashboard-dark.png'
-  const elementsImageLight = '/images/front-pages/landing-page/hero-elements-light.png'
   const elementsImageDark = '/images/front-pages/landing-page/hero-elements-dark.png'
-  const heroSectionBgLight = '/images/front-pages/landing-page/hero-bg-light.png'
   const heroSectionBgDark = '/images/front-pages/landing-page/hero-bg-dark.png'
-
-  // Hooks
-  const dashboardImage = useImageVariant(mode, dashboardImageLight, dashboardImageDark)
-  const elementsImage = useImageVariant(mode, elementsImageLight, elementsImageDark)
-  const heroSectionBg = useImageVariant(mode, heroSectionBgLight, heroSectionBgDark)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -67,7 +49,7 @@ const HeroSection = ({ mode }) => {
 
   return (
     <section id='home' className='relative overflow-hidden pbs-[70px] -mbs-[70px] bg-backgroundPaper z-[1]'>
-      <img src={heroSectionBg} alt='hero-bg' className={styles.heroSectionBg} />
+      <img src={heroSectionBgDark} alt='hero-bg' className={styles.heroSectionBg} />
       <div className={classnames('pbs-16 overflow-hidden', frontCommonStyles.layoutSpacing)}>
         <div className='md:max-is-[550px] mlb-0 mli-auto text-center'>
           <Typography className='font-extrabold text-primary sm:text-[38px] text-3xl mbe-4 leading-[44px]'>
@@ -94,10 +76,14 @@ const HeroSection = ({ mode }) => {
         style={{ transform: `translate(${dashboardPosition.x}px, ${dashboardPosition.y}px)` }}
       >
         <Link href='/' target='_blank'>
-          <img src={dashboardImage} alt='dashboard-image' className={classnames('mli-auto', styles.heroSecDashboard)} />
+          <img
+            src={dashboardImageDark}
+            alt='dashboard-image'
+            className={classnames('mli-auto', styles.heroSecDashboard)}
+          />
           <div className={classnames('absolute', styles.heroSectionElements)}>
             <img
-              src={elementsImage}
+              src={elementsImageDark}
               alt='dashboard-elements'
               style={{ transform: `translate(${elementsPosition.x}px, ${elementsPosition.y}px)` }}
             />

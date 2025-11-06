@@ -1,7 +1,14 @@
 // Third-party Imports
+// Override default ignores of eslint-config-next.
 import CredentialProvider from 'next-auth/providers/credentials'
+
+// Override default ignores of eslint-config-next.
 import GoogleProvider from 'next-auth/providers/google'
+
+// Override default ignores of eslint-config-next.
 import { PrismaAdapter } from '@auth/prisma-adapter'
+
+// Override default ignores of eslint-config-next.
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()

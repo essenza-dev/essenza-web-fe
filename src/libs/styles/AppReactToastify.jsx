@@ -6,7 +6,10 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled } from '@mui/material/styles'
 
 // Third-party Imports
+// Override default ignores of eslint-config-next.
 import 'react-toastify/dist/ReactToastify.css'
+
+// Override default ignores of eslint-config-next.
 import { ToastContainer } from 'react-toastify'
 
 // Config Imports
