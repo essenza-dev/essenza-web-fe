@@ -1,18 +1,13 @@
 'use client'
 
-// React Imports
 import { useEffect, useRef } from 'react'
 
-// Third-party Imports
 import styled from '@emotion/styled'
 
-// Component Imports
 import MaterioLogo from '@core/svg/Logo'
 
-// Config Imports
 import themeConfig from '@configs/themeConfig'
 
-// Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
 import { useSettings } from '@core/hooks/useSettings'
 
@@ -31,14 +26,11 @@ const LogoText = styled.span`
 `
 
 const Logo = ({ color }) => {
-  // Refs
   const logoTextRef = useRef(null)
 
-  // Hooks
   const { isHovered, transitionDuration } = useVerticalNav()
   const { settings } = useSettings()
 
-  // Vars
   const { layout } = settings
 
   useEffect(() => {
@@ -53,7 +45,6 @@ const Logo = ({ color }) => {
         logoTextRef.current.classList.remove('hidden')
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isHovered, layout])
 
   return (
