@@ -2,8 +2,6 @@
 
 import { useState } from 'react'
 
-import dynamic from 'next/dynamic'
-
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
@@ -24,6 +22,7 @@ const defaultSettings = {
 }
 
 const GeneralSettings = () => {
+  const [isEdit, setIsEdit] = useState(false)
   const [settings, setSettings] = useState(defaultSettings)
 
   const handleChange = e => {
@@ -45,6 +44,7 @@ const GeneralSettings = () => {
           <Grid item xs={12} sm={6}>
             <TextField
               size='small'
+              disabled={!isEdit}
               fullWidth
               label='Site Name'
               name='site_name'
@@ -56,6 +56,7 @@ const GeneralSettings = () => {
           <Grid item xs={12} sm={6}>
             <TextField
               size='small'
+              disabled={!isEdit}
               fullWidth
               label='Favicon URL'
               name='favicon'
@@ -67,6 +68,7 @@ const GeneralSettings = () => {
           <Grid item xs={12} sm={6}>
             <TextField
               size='small'
+              disabled={!isEdit}
               fullWidth
               label='Site Logo URL'
               name='site_logo'
@@ -78,6 +80,7 @@ const GeneralSettings = () => {
           <Grid item xs={12} sm={6}>
             <TextField
               size='small'
+              disabled={!isEdit}
               fullWidth
               label='Meta Keywords'
               name='meta_keywords'
@@ -89,6 +92,7 @@ const GeneralSettings = () => {
           <Grid item xs={12}>
             <TextField
               size='small'
+              disabled={!isEdit}
               fullWidth
               multiline
               minRows={3}
@@ -102,6 +106,7 @@ const GeneralSettings = () => {
           <Grid item xs={12}>
             <TextField
               size='small'
+              disabled={!isEdit}
               fullWidth
               multiline
               minRows={3}
@@ -115,10 +120,21 @@ const GeneralSettings = () => {
         </Grid>
 
         <Divider className='mb-5' />
-        <Box className='text-right'>
-          <Button className='w-1/4' variant='contained' color='success' onClick={handleSubmit}>
-            Save
-          </Button>
+        <Box className='text-right flex justify-between flex-row-reverse'>
+          {!isEdit ? (
+            <Button className='w-1/4' variant='contained' color='secondary' onClick={() => setIsEdit(true)}>
+              Edit
+            </Button>
+          ) : (
+            <>
+              <Button className='w-1/4' variant='contained' color='success' onClick={handleSubmit}>
+                Save
+              </Button>
+              <Button className='w-1/4' variant='contained' color='warning' onClick={() => setIsEdit(false)}>
+                Cancel
+              </Button>
+            </>
+          )}
         </Box>
       </CardContent>
     </Card>

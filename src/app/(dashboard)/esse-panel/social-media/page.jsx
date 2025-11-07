@@ -32,6 +32,7 @@ const platforms = [
 ]
 
 const SocialMediaPage = () => {
+  const [isEdit, setIsEdit] = useState(false)
   const [socialMedia, setSocialMedia] = useState(defaultSocialMedia)
 
   const handleAdd = () => {
@@ -65,7 +66,7 @@ const SocialMediaPage = () => {
           {socialMedia.map((item, index) => (
             <Grid container item spacing={2} key={index} alignItems='center'>
               <Grid item xs={5}>
-                <FormControl fullWidth size='small'>
+                <FormControl fullWidth size='small' disabled={!isEdit}>
                   <InputLabel>Platform</InputLabel>
                   <Select
                     value={item.platform}
@@ -89,6 +90,7 @@ const SocialMediaPage = () => {
                 <TextField
                   fullWidth
                   size='small'
+                  disabled={!isEdit}
                   label='URL'
                   placeholder='https://'
                   value={item.url}
@@ -97,32 +99,47 @@ const SocialMediaPage = () => {
               </Grid>
 
               <Grid item xs={2}>
-                <IconButton color='error' onClick={() => handleRemove(index)}>
-                  <i className='ri-delete-bin-line text-red-500 text-lg' />
-                </IconButton>
+                {isEdit && (
+                  <IconButton color='error' onClick={() => handleRemove(index)}>
+                    <i className='ri-delete-bin-line text-red-500 text-lg' />
+                  </IconButton>
+                )}
               </Grid>
             </Grid>
           ))}
         </Grid>
 
-        <Box className='mb-5'>
-          <Button
-            startIcon={<i className='ri-add-circle-line text-blue-500 text-lg' />}
-            variant='outlined'
-            color='primary'
-            onClick={handleAdd}
-            disabled={socialMedia.length >= platforms.length} // disable jika semua sudah ditambahkan
-          >
-            Add Social Media
-          </Button>
-        </Box>
+        {isEdit && (
+          <Box className='mb-5'>
+            <Button
+              startIcon={<i className='ri-add-circle-line text-blue-500 text-lg' />}
+              variant='outlined'
+              color='primary'
+              onClick={handleAdd}
+              disabled={socialMedia.length >= platforms.length} // disable jika semua sudah ditambahkan
+            >
+              Add Social Media
+            </Button>
+          </Box>
+        )}
 
         <Divider className='mb-5' />
 
-        <Box className='text-right'>
-          <Button className='w-1/4' variant='contained' color='success' onClick={handleSubmit}>
-            Save
-          </Button>
+        <Box className='text-right flex justify-between flex-row-reverse'>
+          {!isEdit ? (
+            <Button className='w-1/4' variant='contained' color='secondary' onClick={() => setIsEdit(true)}>
+              Edit
+            </Button>
+          ) : (
+            <>
+              <Button className='w-1/4' variant='contained' color='success' onClick={handleSubmit}>
+                Save
+              </Button>
+              <Button className='w-1/4' variant='contained' color='warning' onClick={() => setIsEdit(false)}>
+                Cancel
+              </Button>
+            </>
+          )}
         </Box>
       </CardContent>
     </Card>
