@@ -79,7 +79,7 @@ const ProductForm = ({ initialData = defaultProduct, onSubmit, onCancel }) => {
   }
 
   return (
-    <Card>
+    <Card className='shadow'>
       <CardHeader
         title={initialData.id ? 'Edit Product' : 'Add New Product'}
         subheader='Isi semua informasi produk di bawah ini.'
@@ -89,7 +89,6 @@ const ProductForm = ({ initialData = defaultProduct, onSubmit, onCancel }) => {
       <form onSubmit={handleSubmit}>
         <CardContent>
           <Grid container spacing={4}>
-            {/* Nama Produk */}
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
@@ -102,7 +101,6 @@ const ProductForm = ({ initialData = defaultProduct, onSubmit, onCancel }) => {
               />
             </Grid>
 
-            {/* Bahasa */}
             <Grid item xs={12} sm={6}>
               <TextField
                 select
@@ -118,7 +116,6 @@ const ProductForm = ({ initialData = defaultProduct, onSubmit, onCancel }) => {
               </TextField>
             </Grid>
 
-            {/* Model */}
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
@@ -131,7 +128,6 @@ const ProductForm = ({ initialData = defaultProduct, onSubmit, onCancel }) => {
               />
             </Grid>
 
-            {/* Ukuran */}
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
@@ -144,7 +140,6 @@ const ProductForm = ({ initialData = defaultProduct, onSubmit, onCancel }) => {
               />
             </Grid>
 
-            {/* Jenis Produk */}
             <Grid item xs={12} sm={6}>
               <TextField
                 select
@@ -160,7 +155,6 @@ const ProductForm = ({ initialData = defaultProduct, onSubmit, onCancel }) => {
               </TextField>
             </Grid>
 
-            {/* Slug */}
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
@@ -173,7 +167,6 @@ const ProductForm = ({ initialData = defaultProduct, onSubmit, onCancel }) => {
               />
             </Grid>
 
-            {/* Deskripsi */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -188,7 +181,6 @@ const ProductForm = ({ initialData = defaultProduct, onSubmit, onCancel }) => {
               />
             </Grid>
 
-            {/* Gambar utama */}
             <Grid item xs={12}>
               <Typography variant='subtitle2' className='mb-2'>
                 Main Image
@@ -216,7 +208,6 @@ const ProductForm = ({ initialData = defaultProduct, onSubmit, onCancel }) => {
               )}
             </Grid>
 
-            {/* Gallery */}
             <Grid item xs={12}>
               <Typography variant='subtitle2' className='mb-2'>
                 Gallery Images
@@ -246,7 +237,6 @@ const ProductForm = ({ initialData = defaultProduct, onSubmit, onCancel }) => {
               </Box>
             </Grid>
 
-            {/* SEO Fields */}
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
@@ -285,7 +275,6 @@ const ProductForm = ({ initialData = defaultProduct, onSubmit, onCancel }) => {
               />
             </Grid>
 
-            {/* Status aktif */}
             <Grid item xs={12} sm={3}>
               <FormControlLabel
                 control={<Switch checked={form.is_active} onChange={handleSwitchChange} />}

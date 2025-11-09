@@ -39,6 +39,7 @@ const GeneralSettings = () => {
   return (
     <Card>
       <CardHeader title='General Settings' />
+      <Divider />
       <CardContent>
         <Grid container spacing={5} className='mbe-5'>
           <Grid item xs={12} sm={6}>

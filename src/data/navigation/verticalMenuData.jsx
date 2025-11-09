@@ -82,19 +82,8 @@ const verticalMenuData = () => [
     children: [{ label: 'User Management', href: '/esse-panel/users' }]
   },
   {
-    label: 'System Tools',
-    icon: 'ri-tools-line',
-    children: [
-      { label: 'Backup Database', href: '/esse-panel/backup' },
-      { label: 'Activity Logs', href: '/esse-panel/activity-logs' },
-      {
-        label: 'SEO Tools',
-        children: [
-          { label: 'Generate Sitemap', href: '/esse-panel/seo/sitemap' },
-          { label: 'Redirect Manager', href: '/esse-panel/seo/redirects' }
-        ]
-      }
-    ]
+    label: 'Activity Logs',
+    icon: 'ri-history-line'
   }
 ]
 

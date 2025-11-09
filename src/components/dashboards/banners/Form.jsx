@@ -57,7 +57,7 @@ const BannersForm = ({ initialData = defaultBanner, onSubmit, onCancel }) => {
   }
 
   return (
-    <Card>
+    <Card className='shadow'>
       <CardHeader
         title={initialData.id ? 'Edit Banner' : 'Add New Banner'}
         subheader='Isi semua informasi banner di bawah ini.'

@@ -3,9 +3,17 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 
-import { Card, CardContent, CardHeader, CardTitle, Button, Divider, Grid, Typography, Box } from '@mui/material'
+import Box from '@mui/material/Box'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
+import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
 
 import { getBannerById, deleteBanner } from '@/services/banner'
+import DetailField from '@/components/DetailField'
 
 const BannerDetailPage = () => {
   const { id } = useParams()
@@ -46,37 +54,16 @@ const BannerDetailPage = () => {
   return (
     <div className='p-6'>
       <Card className='w-full mx-auto shadow'>
-        <CardHeader>
-          <CardTitle>Banner Detail</CardTitle>
-        </CardHeader>
+        <CardHeader titl='Banner Detail' />
         <Divider />
 
         <CardContent>
           <Grid container spacing={4}>
-            <Grid item xs={12} sm={6}>
-              <Typography variant='subtitle2'>Title</Typography>
-              <Typography variant='body1'>{banner.title}</Typography>
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <Typography variant='subtitle2'>Subtitle</Typography>
-              <Typography variant='body1'>{banner.subtitle || '-'}</Typography>
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <Typography variant='subtitle2'>Link URL</Typography>
-              <Typography variant='body1'>{banner.link_url || '-'}</Typography>
-            </Grid>
-
-            <Grid item xs={12} sm={3}>
-              <Typography variant='subtitle2'>Order No</Typography>
-              <Typography variant='body1'>{banner.order_no}</Typography>
-            </Grid>
-
-            <Grid item xs={12} sm={3}>
-              <Typography variant='subtitle2'>Active</Typography>
-              <Typography variant='body1'>{banner.is_active ? 'Yes' : 'No'}</Typography>
-            </Grid>
+            <DetailField label={'Title'} value={banner?.title} />
+            <DetailField label={'Subtitle'} value={banner?.subtitle} />
+            <DetailField label={'Link URL'} value={banner?.link_url} />
+            <DetailField label={'Order No'} value={banner?.title} />
+            <DetailField label={'Active'} value={banner.is_active ? 'Yes' : 'No'} />
 
             <Grid item xs={12}>
               <Typography variant='subtitle2' className='mb-2'>

@@ -2,14 +2,14 @@
 
 import { useRouter } from 'next/navigation'
 
-import ProductForm from '@/components/dashboards/products/Form'
+import BannersForm from '@/components/dashboards/banners/Form'
 
 const BannersEditPage = () => {
   const router = useRouter()
 
   const handleSubmit = e => {}
 
-  return <ProductForm onCancel={() => router.push('/esse-panel/products')} onSubmit={handleSubmit} />
+  return <BannersForm onCancel={() => router.push('/esse-panel/banners')} onSubmit={handleSubmit} />
 }
 
 export default BannersEditPage

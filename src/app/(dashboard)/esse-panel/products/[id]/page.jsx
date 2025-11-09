@@ -2,38 +2,38 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-
 import { Card, CardContent, CardHeader, CardTitle, Button, Divider, Grid, Typography, Box } from '@mui/material'
 
-import { getBannerById, deleteBanner } from '@/services/banner'
+import { getProductById, deleteProduct } from '@/services/products'
+import DetailField from '@/components/DetailField'
 
-const BannerDetailPage = () => {
+const ProductDetailPage = () => {
   const { id } = useParams()
   const router = useRouter()
-  const [banner, setBanner] = useState(null)
+  const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchBanner = async () => {
+    const fetchProduct = async () => {
       try {
-        const data = await getBannerById(id)
-        setBanner(data)
+        const data = await getProductById(id)
+        setProduct(data)
       } catch (err) {
-        console.error('Failed to fetch banner:', err)
+        console.error('Failed to fetch product:', err)
       } finally {
         setLoading(false)
       }
     }
 
-    if (id) fetchBanner()
+    if (id) fetchProduct()
   }, [id])
 
   const handleDelete = async () => {
-    if (confirm('Are you sure you want to delete this banner?')) {
+    if (confirm('Are you sure you want to delete this product?')) {
       try {
-        await deleteBanner(id)
-        alert('Banner deleted successfully!')
-        router.push('/esse-panel/banner')
+        await deleteProduct(id)
+        alert('Product deleted successfully!')
+        router.push('/esse-panel/products')
       } catch (err) {
         console.error('Delete failed:', err)
       }
@@ -41,51 +41,29 @@ const BannerDetailPage = () => {
   }
 
   if (loading) return <p className='p-6'>Loading...</p>
-  if (!banner) return <p className='p-6'>Banner not found.</p>
+  if (!product) return <p className='p-6'>Product not found.</p>
 
   return (
     <div className='p-6'>
       <Card className='w-full mx-auto shadow'>
-        <CardHeader>
-          <CardTitle>Banner Detail</CardTitle>
-        </CardHeader>
+        <CardHeader title='Product Detail' />
         <Divider />
-
         <CardContent>
           <Grid container spacing={4}>
-            <Grid item xs={12} sm={6}>
-              <Typography variant='subtitle2'>Title</Typography>
-              <Typography variant='body1'>{banner.title}</Typography>
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <Typography variant='subtitle2'>Subtitle</Typography>
-              <Typography variant='body1'>{banner.subtitle || '-'}</Typography>
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <Typography variant='subtitle2'>Link URL</Typography>
-              <Typography variant='body1'>{banner.link_url || '-'}</Typography>
-            </Grid>
-
-            <Grid item xs={12} sm={3}>
-              <Typography variant='subtitle2'>Order No</Typography>
-              <Typography variant='body1'>{banner.order_no}</Typography>
-            </Grid>
-
-            <Grid item xs={12} sm={3}>
-              <Typography variant='subtitle2'>Active</Typography>
-              <Typography variant='body1'>{banner.is_active ? 'Yes' : 'No'}</Typography>
-            </Grid>
+            <DetailField label='Product Name' value={product.name} />
+            <DetailField label='Category' value={product.category} />
+            <DetailField label='Price' value={`Rp ${product.price?.toLocaleString() || '0'}`} />
+            <DetailField label='Stock' value={product.stock} />
+            <DetailField label='Description' value={product.description} xs={12} />
 
             <Grid item xs={12}>
               <Typography variant='subtitle2' className='mb-2'>
-                Banner Image
+                Product Image
               </Typography>
-              {banner.image ? (
+              {product.image ? (
                 <img
-                  src={banner.image}
-                  alt={banner.title}
+                  src={product.image}
+                  alt={product.name}
                   className='w-[220px] h-[120px] object-cover rounded border'
                 />
               ) : (
@@ -105,7 +83,7 @@ const BannerDetailPage = () => {
             color='secondary'
             className='w-1/4'
             startIcon={<i className='ri-arrow-left-line text-lg' />}
-            onClick={() => router.push('/esse-panel/banners')}
+            onClick={() => router.push('/esse-panel/products')}
           >
             Back
           </Button>
@@ -125,7 +103,7 @@ const BannerDetailPage = () => {
               color='primary'
               className='w-1/2'
               startIcon={<i className='ri-pencil-line text-lg' />}
-              onClick={() => router.push(`/esse-panel/banners/${id}/edit`)}
+              onClick={() => router.push(`/esse-panel/products/${id}/edit`)}
             >
               Edit
             </Button>
@@ -136,4 +114,4 @@ const BannerDetailPage = () => {
   )
 }
 
-export default BannerDetailPage
+export default ProductDetailPage
