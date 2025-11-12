@@ -1,46 +1,48 @@
+'use client'
 import React, { useCallback, useState } from 'react'
-
 import MuiAlert from '@mui/material/Alert'
-import Box from '@mui/material/Box'
 import Snackbar from '@mui/material/Snackbar'
-import Stack from '@mui/material/Stack'
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />
 })
 
 const useSnackbar = () => {
-  const [snackbar, setSnackbar] = useState({
+  const [state, setState] = useState({
     open: false,
     message: '',
-    severity: 'info' // 'error', 'warning', 'info', 'success'
+    severity: 'info'
   })
 
-  const showSnackbar = useCallback((severity = 'info', message) => {
-    setSnackbar({ open: true, message, severity })
+  const show = useCallback((message, severity = 'info') => {
+    setState({ open: true, message, severity })
   }, [])
 
-  const handleClose = useCallback(() => {
-    setSnackbar(prev => ({ ...prev, open: false }))
+  const success = useCallback(message => show(message, 'success'), [show])
+  const error = useCallback(message => show(message, 'error'), [show])
+  const info = useCallback(message => show(message, 'info'), [show])
+  const warning = useCallback(message => show(message, 'warning'), [show])
+
+  const close = useCallback(() => {
+    setState(prev => ({ ...prev, open: false }))
   }, [])
 
   const SnackbarComponent = (
     <Snackbar
-      open={snackbar.open}
-      autoHideDuration={5000}
-      onClose={handleClose}
+      open={state.open}
+      autoHideDuration={4000}
+      onClose={close}
       anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      sx={{ zIndex: 100000 }}
+      sx={{ zIndex: 2000 }}
     >
-      <Stack sx={{ width: '100%' }} spacing={2}>
-        <Alert variant='filled' onClose={handleClose} severity={snackbar.severity} className='items-center'>
-          <Box dangerouslySetInnerHTML={{ __html: snackbar.message }} />
-        </Alert>
-      </Stack>
+      <Alert onClose={close} severity={state.severity}>
+        {state.message}
+      </Alert>
     </Snackbar>
   )
 
-  return { showSnackbar, SnackbarComponent }
+  // 🪄 return helper lengkap
+  return { show, success, error, info, warning, SnackbarComponent }
 }
 
 export default useSnackbar

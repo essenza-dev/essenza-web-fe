@@ -13,6 +13,10 @@ import Button from '@mui/material/Button'
 
 import useSnackbar from '@/@core/hooks/useSnackbar'
 
+import { updateGeneralSetting } from '@/services/setting'
+
+import { handleApiResponse } from '@/utils/handleApiResponse'
+
 const defaultSettings = {
   site_name: 'PT. Maju Jaya Keramik',
   site_description: 'Distributor ubin dan keramik terpercaya dengan berbagai pilihan motif, warna, dan ukuran.',
@@ -27,7 +31,7 @@ const GeneralSettings = () => {
   const [isEdit, setIsEdit] = useState(false)
   const [settings, setSettings] = useState(defaultSettings)
 
-  const { showSnackbar, SnackbarComponent } = useSnackbar()
+  const { success, error, SnackbarComponent } = useSnackbar()
 
   const handleChange = e => {
     const { name, value } = e.target
@@ -35,10 +39,17 @@ const GeneralSettings = () => {
     setSettings(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = () => {
-    console.log('Saving settings...', settings)
-    showSnackbar('success', 'Settings saved successfully!')
+  const handleSubmit = async e => {
+    e.preventDefault()
+
     setIsEdit(false)
+
+    await handleApiResponse(
+      () => {
+        updateGeneralSetting(e)
+      },
+      { success, error }
+    )
   }
 
   return (
@@ -132,7 +143,7 @@ const GeneralSettings = () => {
               <Button
                 className='w-1/4'
                 variant='contained'
-                color='secondary'
+                color='info'
                 onClick={() => setIsEdit(true)}
                 startIcon={<i className='ri-pencil-line text-lg' />}
               >

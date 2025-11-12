@@ -1,27 +1,15 @@
-const updateGeneralSetting = async (id, data) => {
-  try {
-    const res = await axios.post(`${API_URL}/projects/${id}?_method=PUT`, data, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
+import apiClient from '@/utils/apiClient'
 
-    return res.data
-  } catch (error) {
-    console.error(`❌ Error updating Project ${id}:`, error)
-    throw error
-  }
+const updateGeneralSetting = async (id, data) => {
+  return await apiClient.put(`/projects/${id}`, data, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
 }
 
 const updateSocialMedia = async (id, data) => {
-  try {
-    const res = await axios.post(`${API_URL}/projects/${id}?_method=PUT`, data, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
-
-    return res.data
-  } catch (error) {
-    console.error(`❌ Error updating Project ${id}:`, error)
-    throw error
-  }
+  return await apiClient.put(`/projects/${id}`, data, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
 }
 
 export { updateGeneralSetting, updateSocialMedia }

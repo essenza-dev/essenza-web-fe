@@ -1,64 +1,27 @@
-import axios from 'axios'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+import apiClient from '@/utils/apiClient'
 
 const getPages = async (params = {}) => {
-  try {
-    const res = await axios.get(`${API_URL}/pages`, { params })
-
-    return res.data
-  } catch (error) {
-    console.error('❌ Error fetching Pages:', error)
-    throw error
-  }
+  return await apiClient.get(`/pages`, { params })
 }
 
 const getPageById = async id => {
-  try {
-    const res = await axios.get(`${API_URL}/pages/${id}`)
-
-    return res.data
-  } catch (error) {
-    console.error(`❌ Error fetching Page ${id}:`, error)
-    throw error
-  }
+  return await apiClient.get(`/pages/${id}`)
 }
 
 const createPage = async data => {
-  try {
-    const res = await axios.post(`${API_URL}/pages`, data, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
-
-    return res.data
-  } catch (error) {
-    console.error('❌ Error creating Page:', error)
-    throw error
-  }
+  return await apiClient.post(`/pages`, data, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
 }
 
 const updatePage = async (id, data) => {
-  try {
-    const res = await axios.post(`${API_URL}/pages/${id}?_method=PUT`, data, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
-
-    return res.data
-  } catch (error) {
-    console.error(`❌ Error updating Page ${id}:`, error)
-    throw error
-  }
+  return await apiClient.put(`/pages/${id}`, data, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
 }
 
 const deletePage = async id => {
-  try {
-    const res = await axios.delete(`${API_URL}/pages/${id}`)
-
-    return res.data
-  } catch (error) {
-    console.error(`❌ Error deleting Page ${id}:`, error)
-    throw error
-  }
+  return await apiClient.delete(`/pages/${id}`)
 }
 
 export { getPages, getPageById, createPage, updatePage, deletePage }
