@@ -3,8 +3,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
@@ -14,6 +12,7 @@ import Grid from '@mui/material/Grid'
 import CustomTextField from '@/@core/components/custom-inputs/TextField'
 
 import { getStoreById, updateStore, createStore } from '@/services/stores'
+import FormActions from '@/components/FormActions'
 
 const defaultData = {
   name: '',
@@ -94,26 +93,7 @@ const StoreForm = ({ id }) => {
           </Grid>
         </CardContent>
         <Divider />
-        <Box className='flex justify-between p-4 pt-0'>
-          <Button
-            variant='outlined'
-            className='w-1/6'
-            color='warning'
-            startIcon={<i className='ri-close-line text-lg' />}
-            onClick={() => router.push('/esse-panel/stores')}
-          >
-            Cancel
-          </Button>
-          <Button
-            type='submit'
-            variant='contained'
-            className='w-1/6'
-            color='success'
-            startIcon={<i className='ri-save-3-line text-lg' />}
-          >
-            {defaultData.id ? 'Update' : 'Save'}
-          </Button>
-        </Box>
+        <FormActions onCancel={() => router.push('/esse-panel/stores')} isEdit={isEdit} />
       </form>
     </Card>
   )

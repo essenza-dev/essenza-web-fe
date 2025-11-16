@@ -2,8 +2,18 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { Card, CardHeader, CardTitle, CardContent, Button, Divider, Grid, Typography, Box } from '@mui/material'
-import { getStoreById, deleteStore } from '@/services/stores'
+
+import Card from '@mui/material/Card'
+import CardHeader from '@mui/material/CardHeader'
+import CardContent from '@mui/material/CardContent'
+import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
+import Box from '@mui/material/Box'
+
+import { getArticleById, deleteArticle } from '@/services/article'
+
 import DetailField from '@/components/DetailField'
 
 export const article = {
@@ -13,10 +23,10 @@ export const article = {
   tags: ['marketing', 'business', 'growth'], // maks 3
   excerpt: 'Pelajari bagaimana strategi konten yang tepat mampu meningkatkan penjualan online Anda secara signifikan.',
   author: 'Admin',
-  createdAt: '2025-01-14',
+  created_at: '2025-01-14',
+  published_at: '2025-01-14',
   banner: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=1200',
   readingTime: '6 min read',
-
   content: `
     <h2>Kenapa Strategi Konten Penting?</h2>
     <p>
@@ -61,7 +71,7 @@ const ArticleDetailPage = () => {
 
   useEffect(() => {
     if (id) {
-      getStoreById(id)
+      getArticleById(id)
         .then(data => setStore(data))
         .finally(() => setLoading(false))
     }
@@ -69,7 +79,7 @@ const ArticleDetailPage = () => {
 
   const handleDelete = async () => {
     if (confirm('Delete this Store?')) {
-      await deleteStore(id)
+      await deleteArticle(id)
       alert('Deleted successfully!')
       router.push('/esse-panel/stores')
     }
@@ -81,12 +91,8 @@ const ArticleDetailPage = () => {
   return (
     <div className='p-6'>
       <Card className='shadow'>
-        <CardHeader>
-          <CardTitle>Article Detail</CardTitle>
-        </CardHeader>
-
+        <CardHeader title='Article Detail' />
         <Divider />
-
         <CardContent>
           <Grid container spacing={4}>
             <DetailField label='Title' value={article.title} />
@@ -96,7 +102,6 @@ const ArticleDetailPage = () => {
             <DetailField label='Published At' value={article.published_at} />
             <DetailField label='Created At' value={article.created_at} />
             <DetailField label='Updated At' value={article.updated_at} />
-
             <DetailField label='Meta Title' value={article.meta_title} />
             <DetailField label='Meta Description' value={article.meta_description} xs={12} />
             <DetailField label='Meta Keywords' value={article.meta_keywords} xs={12} />
@@ -183,7 +188,7 @@ const ArticleDetailPage = () => {
             color='warning'
             className='w-1/6'
             startIcon={<i className='ri-pencil-line' />}
-            onClick={() => router.push(`/esse-panel/articless/${id}/edit`)}
+            onClick={() => router.push(`/esse-panel/articles/${id}/edit`)}
           >
             Edit
           </Button>

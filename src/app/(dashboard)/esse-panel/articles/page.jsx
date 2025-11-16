@@ -22,6 +22,7 @@ import TableGeneric from '@/@core/components/table/Generic'
 import CustomAvatar from '@/@core/components/mui/Avatar'
 import { getInitials } from '@/utils/getInitials'
 import TableHeaderActions from '@/@core/components/table/HeaderActions'
+import DialogBasic from '@/components/DialogBasic'
 
 const fuzzyFilter = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
@@ -97,6 +98,8 @@ const ArticlePage = () => {
   const [data, setData] = useState(defaultArticlesData)
   const [filteredData, setFilteredData] = useState(data)
   const [globalFilter, setGlobalFilter] = useState('')
+  const [selectedId, setSelectedId] = useState('')
+  const [openDelete, setOpenDelete] = useState(false)
   const router = useRouter()
 
   const actionsData = row => [
@@ -121,7 +124,10 @@ const ArticlePage = () => {
       icon: <i className='ri-delete-bin-line text-red-500' />,
       menuItemProps: {
         className: 'gap-2',
-        onClick: () => deleteStore(row.original.id)
+        onClick: () => {
+          setOpenDelete(true)
+          setSelectedId(row.original.id)
+        }
       }
     }
   ]
@@ -182,9 +188,10 @@ const ArticlePage = () => {
     []
   )
 
-  const deleteStore = id => {
-    setData(prev => prev.filter(item => item.id !== id))
-    setFilteredData(prev => prev.filter(item => item.id !== id))
+  const deleteStore = () => {
+    setData(prev => prev.filter(item => item.id !== selectedId))
+    setFilteredData(prev => prev.filter(item => item.id !== selectedId))
+    setSelectedId('')
   }
 
   const table = useReactTable({
@@ -200,28 +207,37 @@ const ArticlePage = () => {
   })
 
   return (
-    <Card>
-      <CardHeader title='Article Management' className='p-4' />
-      <Divider />
-      <TableHeaderActions
-        searchPlaceholder='Search Article'
-        searchValue={globalFilter ?? ''}
-        onSearchChange={setGlobalFilter}
-        addLabel='Add Article'
-        addHref='/esse-panel/articles/add'
-        addColor='success'
+    <>
+      <Card>
+        <CardHeader title='Article Management' className='p-4' />
+        <Divider />
+        <TableHeaderActions
+          searchPlaceholder='Search Article'
+          searchValue={globalFilter ?? ''}
+          onSearchChange={setGlobalFilter}
+          addLabel='Add Article'
+          addHref='/esse-panel/articles/add'
+          addColor='success'
+        />
+        <TableGeneric table={table} />
+        <TablePagination
+          component='div'
+          count={table.getFilteredRowModel().rows.length}
+          rowsPerPage={table.getState().pagination.pageSize || 10}
+          page={table.getState().pagination.pageIndex || 0}
+          onPageChange={(_, page) => table.setPageIndex(page)}
+          onRowsPerPageChange={e => table.setPageSize(Number(e.target.value))}
+          rowsPerPageOptions={[5, 10, 25]}
+        />
+      </Card>
+      <DialogBasic
+        open={openDelete}
+        onClose={() => setOpenDelete(false)}
+        omSubmit={() => deleteStore()}
+        title='Delete Article'
+        description='Are you sure you want to delete this article? This action is permanent and cannot be undone.'
       />
-      <TableGeneric table={table} />
-      <TablePagination
-        component='div'
-        count={table.getFilteredRowModel().rows.length}
-        rowsPerPage={table.getState().pagination.pageSize || 10}
-        page={table.getState().pagination.pageIndex || 0}
-        onPageChange={(_, page) => table.setPageIndex(page)}
-        onRowsPerPageChange={e => table.setPageSize(Number(e.target.value))}
-        rowsPerPageOptions={[5, 10, 25]}
-      />
-    </Card>
+    </>
   )
 }
 
