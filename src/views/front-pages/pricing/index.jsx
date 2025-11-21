@@ -4,7 +4,8 @@
 import { useEffect } from 'react'
 
 // Component Imports
-import PricingSection from '@views/front-pages/pricing/PricingSection'
+// import PricingSection from '@views/front-pages/pricing/PricingSection'
+
 import FreeTrial from './FreeTrial'
 import Plans from './Plans'
 import Faqs from './Faqs'
@@ -24,7 +25,7 @@ const PricingWrapper = ({ data }) => {
 
   return (
     <>
-      <PricingSection data={data} />
+      {/* <PricingSection data={data} /> */}
       <FreeTrial />
       <Plans />
       <Faqs />
