@@ -52,7 +52,8 @@
     "next.config.mjs",
     "tailwind.config.js",
     "**/*.js",
-    "**/*.jsx"
+    "**/*.jsx",
+    "src/assets/iconify-icons/bundle-icons-css.cjs"
   ],
   "exclude": [
     "node_modules"
