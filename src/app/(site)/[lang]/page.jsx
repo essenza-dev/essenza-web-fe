@@ -1,9 +1,9 @@
-import BannerSection from '@/components/section/home/BannerSection'
-import CategorySection from '@/components/section/home/CategorySection'
-import DiscoverSection from '@/components/section/home/DiscoverSection'
-import EndSection from '@/components/section/home/EndSection'
-import NewsSection from '@/components/section/home/NewsSection'
-import ProjectSection from '@/components/section/home/ProjectSection'
+import BannerSection from '@/components/section/BannerSection'
+import CategorySection from '@/components/section/CategorySection'
+import DiscoverSection from '@/components/section/DiscoverSection'
+import EndSection from '@/components/section/EndSection'
+import NewsSection from '@/components/section/NewsSection'
+import ProjectSection from '@/components/section/ProjectSection'
 
 const HomePage = () => {
   // Hooks

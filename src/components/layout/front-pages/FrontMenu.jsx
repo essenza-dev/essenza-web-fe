@@ -112,7 +112,7 @@ const FrontMenu = props => {
   return (
     <Wrapper isBelowLgScreen={isBelowLgScreen} isDrawerOpen={isDrawerOpen} setIsDrawerOpen={setIsDrawerOpen}>
       {staticMenu.map((menu, i) => (
-        <Typography key={menu.id} component={Link} href={`/${locale}/${menu.href}`} className={'text-[#212121]'}>
+        <Typography key={menu.id} component={Link} href={`/${locale}${menu.href}`} className={'text-[#212121]'}>
           {menu.label}
         </Typography>
       ))}
