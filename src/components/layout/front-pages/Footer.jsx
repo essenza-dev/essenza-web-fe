@@ -60,6 +60,12 @@ const styles = {
   },
   rightButtonGroup: {
     display: { xs: 'none', sm: 'flex' }
+  },
+  textSubcribe: {
+    color: '#212121',
+    mt: { xs: 4, sm: 1 },
+    fontWeight: 400,
+    fontSize: '12px'
   }
 }
 
@@ -106,9 +112,7 @@ const socialMedia = [
 const SubcribesFooter = () => {
   return (
     <>
-      <Typography className='text-[#212121] mt-1 font-weigth-400 text-xs'>
-        Enter your email to receive news, information about essenza
-      </Typography>
+      <Typography sx={styles.textSubcribe}>Enter your email to receive news, information about essenza</Typography>
       <Grid container spacing={2} mt={2}>
         <Grid item xs={9}>
           <TextField
@@ -155,24 +159,29 @@ const Footer = () => {
             <div className='flex flex-col items-start gap-1'>
               <Box sx={styles.logoWrapper}>
                 <Link href='/'>
-                  <img className='h-[74px]' src={'/logo.svg'} />
+                  <Box
+                    component='img'
+                    alt='Essenza Logo'
+                    sx={{ height: { xs: '60px', sm: '74px' } }}
+                    src={'/logo.svg'}
+                  />
                 </Link>
 
                 {/* Mobile Buttons */}
                 <Grid container className='py-5' spacing={2} sx={styles.mobileButtonGroup}>
-                  <Grid item xs={6}>
+                  <Grid item xs={6} className='w-full'>
                     <Button
                       variant='outlined'
-                      className='w-full text-[#757575] border-[#757575] rounded-[6px]'
+                      className='text-[#757575] border-[#757575] rounded-[6px] py-[4px]'
                       fullWidth
                     >
                       Esperianza
                     </Button>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={6} className='w-full'>
                     <Button
                       variant='outlined'
-                      className='w-full text-[#757575] border-[#757575] rounded-[6px]'
+                      className='text-[#757575] border-[#757575] rounded-[6px] py-[4px]'
                       fullWidth
                     >
                       Tokopedia

@@ -34,8 +34,8 @@ const styles = {
     '& .banner-swiper .swiper-button-next, & .banner-swiper .swiper-button-prev': {
       bottom: '20px !important',
       top: 'auto !important',
-      width: '35px',
-      height: '35px',
+      width: { xs: '25px', sm: '35px' },
+      height: { xs: '25px', sm: '35px' },
       background: 'rgba(0,0,0,0.3)',
       color: '#fff'
     },
@@ -63,7 +63,7 @@ const styles = {
       borderLeft: '1px solid #ffffff',
       padding: '6px',
       borderRadius: '6px 0 0 6px',
-      left: 'calc(100vw - 95px)'
+      left: { xs: 'calc(100vw - 75px)', sm: 'calc(100vw - 95px)' }
     },
     '& .banner-swiper .swiper-button-next::after, & .banner-swiper .swiper-button-prev::after': {
       fontSize: '16px'

@@ -8,7 +8,7 @@ import Slide from '@mui/material/Slide'
 import TextField from '@mui/material/TextField'
 
 const SearchBar = props => {
-  const { checked, locale } = props
+  const { checked, locale, isMobile = false } = props
   const router = useRouter()
   const [query, setQuery] = useState('')
 
@@ -22,15 +22,15 @@ const SearchBar = props => {
       <Slide direction='down' in={checked} mountOnEnter unmountOnExit>
         <Box
           sx={{
-            position: 'absolute',
-            top: 124,
-            left: 180,
+            position: isMobile ? 'relative' : 'absolute',
+            top: isMobile ? 'unset' : 124,
+            left: isMobile ? 'unset' : 180,
             backgroundColor: 'white',
-            width: 'calc(100vw - 360px)',
+            width: isMobile ? '100%' : 'calc(100vw - 360px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: 4,
+            padding: isMobile ? 'unset' : 4,
             borderRadius: '10px'
           }}
         >

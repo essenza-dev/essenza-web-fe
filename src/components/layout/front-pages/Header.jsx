@@ -44,21 +44,25 @@ const Header = ({ mode }) => {
           frontLayoutClasses.navbar,
           styles.navbar,
           { [styles.headerScrolled]: trigger },
-          'bg-white mt-[40px] rounded-[10px] py-0'
+          'bg-white mt-[40px] rounded-[10px] py-0 pl-1 pr-3'
         )}
       >
         <div className={classnames(frontLayoutClasses.navbarContent, styles.navbarContent)}>
           {isBelowLgScreen ? (
-            <div className='contents items-center gap-2 sm:gap-4 relative'>
+            <div className='contents items-center gap-1 sm:gap-4 relative'>
               <Link href='/'>
-                <img className='h-[74px] flex' src={'/logo.svg'} />
+                <img className='h-[60px] flex' src={'/logo.svg'} />
               </Link>
               <IconButton
-                onClick={() => setIsDrawerOpen(true)}
+                onClick={() => setIsDrawerOpen(!isDrawerOpen)}
                 className='-mis-2'
-                sx={{ border: '1px solid #212121', borderRadius: '6px' }}
+                sx={{ border: '1px solid #212121', borderRadius: '6px', zIndex: 9999 }}
               >
-                <Box component='img' src='/icons/menu.svg' alt='menu' />
+                {isDrawerOpen ? (
+                  <Box component='img' src='/icons/close.svg' alt='close' />
+                ) : (
+                  <Box component='img' src='/icons/menu.svg' alt='menu' />
+                )}
               </IconButton>
               <FrontMenu mode={mode} isDrawerOpen={isDrawerOpen} setIsDrawerOpen={setIsDrawerOpen} />
             </div>

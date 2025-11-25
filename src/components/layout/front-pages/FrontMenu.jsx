@@ -12,7 +12,6 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Drawer from '@mui/material/Drawer'
 import useMediaQuery from '@mui/material/useMediaQuery'
-import IconButton from '@mui/material/IconButton'
 
 // Third-party Imports
 import classnames from 'classnames'
@@ -57,6 +56,29 @@ const staticMenu = [
   }
 ]
 
+const styles = {
+  containerDrawer: {
+    '& .MuiDrawer-paper': {
+      width: ['100%', 300],
+      borderRadius: '10px',
+      width: 'calc(100vw - 48px)',
+      height: 'fit-content',
+      position: 'fixed',
+      top: '115px',
+      left: '24px',
+      margin: '0 auto'
+    },
+    '& .MuiDrawer-paper a': {
+      padding: '18px 0',
+      borderBottom: '1px solid #2121214D'
+    },
+    '& .MuiDrawer-paper .btn-esperianza': {
+      marginTop: '18px',
+      width: 'fit-content'
+    }
+  }
+}
+
 const Wrapper = props => {
   // Props
   const { children, isBelowLgScreen, className, isDrawerOpen, setIsDrawerOpen } = props
@@ -68,18 +90,15 @@ const Wrapper = props => {
         anchor='left'
         open={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
+        hideBackdrop
         ModalProps={{
+          disablePortal: true,
           keepMounted: true
         }}
-        sx={{ '& .MuiDrawer-paper': { width: ['100%', 300] } }}
+        sx={styles.containerDrawer}
         className={classnames('p-5', className)}
       >
-        <div className='p-4 flex flex-col gap-x-3'>
-          <IconButton onClick={() => setIsDrawerOpen(false)} className='absolute inline-end-4 block-start-2'>
-            <i className='ri-close-line' />
-          </IconButton>
-          {children}
-        </div>
+        <div className='p-4 flex flex-col gap-x-3'>{children}</div>
       </Drawer>
     )
   }
@@ -112,6 +131,9 @@ const FrontMenu = props => {
   return (
     <>
       <Wrapper isBelowLgScreen={isBelowLgScreen} isDrawerOpen={isDrawerOpen} setIsDrawerOpen={setIsDrawerOpen}>
+        <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+          <SearchBar checked={true} locale={locale} isMobile={true} />
+        </Box>
         {staticMenu.map((menu, i) => (
           <Typography key={i} component={Link} href={`/${locale}${menu.href}`} className={'text-[#212121]'}>
             {menu.label}
@@ -120,7 +142,7 @@ const FrontMenu = props => {
         <Typography
           component={Link}
           href={`/${locale}`}
-          className={'bg-[#C1A658] px-[40px] text-[#ffffff] py-[9px] rounded-[6px]'}
+          className={'bg-[#C1A658] px-[40px] text-[#ffffff] py-[9px] rounded-[6px] btn-esperianza'}
           color='text.primary'
         >
           Esperianza
@@ -130,6 +152,7 @@ const FrontMenu = props => {
           src='/icons/search.svg'
           alt='search'
           className='cursor-pointer'
+          sx={{ display: { xs: 'none', sm: 'block' } }}
           onClick={handleClickSearch}
         />
       </Wrapper>

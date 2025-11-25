@@ -14,18 +14,20 @@ import 'swiper/css/pagination'
 
 const styles = {
   containerBox: bgColor => ({
-    padding: '24px 0',
+    padding: { xs: '12px 0', sm: '24px 0' },
     background: bgColor || 'white'
   }),
   bannerBox: {
     width: '100%',
     overflow: 'visible',
     '& .banner-swiper': {
-      paddingTop: '56px'
+      paddingTop: { xs: 0, sm: '56px' },
+      paddingBottom: { xs: '48px', sm: 0 },
+      marginTop: { xs: '52px', sm: 'unset' }
     },
     '& .banner-swiper .swiper-pagination': {
-      bottom: '36px !important',
-      left: '24px !important',
+      bottom: { xs: '14px !important', sm: '36px !important' },
+      left: { xs: '-4px !important', sm: '24px !important' },
       textAlign: 'left !important',
       width: 'auto !important'
     },
@@ -38,13 +40,14 @@ const styles = {
       backgroundColor: '#BD8100'
     },
     '& .banner-swiper .swiper-button-next, & .banner-swiper .swiper-button-prev': {
-      width: '35px',
-      height: '35px',
+      width: { xs: '25px', sm: '35px' },
+      height: { xs: '25px', sm: '35px' },
       background: 'transparent',
       color: '#212121',
       zIndex: 99,
       position: 'absolute',
-      top: '30px'
+      top: { xs: 'unset', sm: '30px' },
+      bottom: { xs: '12px', sm: 'unset' }
     },
     '& .banner-swiper .swiper-button-next': {
       borderTop: '1px solid #212121',
@@ -59,7 +62,7 @@ const styles = {
       borderLeft: '1px solid #212121',
       padding: '6px',
       borderRadius: '6px 0 0 6px',
-      left: 'calc(100% - 74px)'
+      left: { xs: 'calc(100% - 54px)', sm: 'calc(100% - 74px)' }
     },
     '& .banner-swiper .swiper-button-next::before': {
       content: '""',
@@ -75,13 +78,15 @@ const styles = {
       fontSize: '16px'
     }
   },
-
   titleBanner: {
-    fontSize: { xs: '18px', md: '24px' },
+    fontSize: { xs: '14px', md: '24px' },
     margin: '12px 0',
     width: '100%',
     color: '#212121',
     marginBottom: '-48px'
+  },
+  descriptionBanner: {
+    fontSize: { xs: '12px', md: '16px' }
   },
   bannerImage: {
     width: '100%',
@@ -102,7 +107,7 @@ const defData = [
 const CardCarousel = ({ data = defData, title, bgColor, duration = 1000 }) => {
   return (
     <Box sx={styles.containerBox(bgColor)}>
-      <Box className={classnames('pb-6', frontCommonStyles.layoutSpacing)} sx={styles.bannerBox}>
+      <Box className={classnames(frontCommonStyles.layoutSpacing)} sx={styles.bannerBox}>
         <Typography sx={styles.titleBanner}>{title}</Typography>
         <Swiper
           className='banner-swiper'
@@ -125,7 +130,7 @@ const CardCarousel = ({ data = defData, title, bgColor, duration = 1000 }) => {
           {data.map((img, i) => (
             <SwiperSlide key={i}>
               <Box component='img' src={img.src} alt={`Banner ${img.src}`} sx={styles.bannerImage} />
-              <Typography>{img.title}</Typography>
+              <Typography sx={styles.descriptionBanner}>{img.title}</Typography>
             </SwiperSlide>
           ))}
         </Swiper>
