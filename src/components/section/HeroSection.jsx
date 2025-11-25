@@ -10,7 +10,8 @@ import Button from '@mui/material/Button'
 import classnames from 'classnames'
 
 import styles from './styles.module.css'
-import frontCommonStyles from '@/components/section/home/styles.module.css'
+
+import frontCommonStyles from '@views/front-pages/styles.module.css'
 
 const HeroSection = () => {
   const [dashboardPosition, setDashboardPosition] = useState({ x: 0, y: 0 })

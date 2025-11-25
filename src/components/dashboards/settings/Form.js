@@ -14,7 +14,7 @@ import CustomTextField from '@/@core/components/custom-inputs/TextField'
 
 import useSnackbar from '@/@core/hooks/useSnackbar'
 
-import { updateGeneralSetting } from '@/services/setting'
+import { updateSetting } from '@/services/setting'
 
 import { handleApiResponse } from '@/utils/handleApiResponse'
 
@@ -68,7 +68,7 @@ const SettingsForm = () => {
   const handleSubmit = async e => {
     e.preventDefault()
 
-    await handleApiResponse(() => updateGeneralSetting(data), {
+    await handleApiResponse(() => updateSetting(data), {
       success: msg => success(msg),
       error: msg => error(msg),
       onSuccess: () => setIsEdit(false),
