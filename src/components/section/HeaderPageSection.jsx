@@ -1,11 +1,11 @@
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 
-const HeaderPageSection = ({ title, subTitle, bgImage }) => {
+const HeaderPageSection = ({ title = '', subTitle = '', height = '100vh', bgImage }) => {
   const styles = {
     container: {
       width: '100vw',
-      height: '100vh',
+      height: height,
       position: 'relative',
       marginTop: '-115px'
     },
@@ -28,7 +28,7 @@ const HeaderPageSection = ({ title, subTitle, bgImage }) => {
       top: '52vh'
     },
     image: {
-      height: '100vh',
+      height: height,
       width: '100vw',
       objectFit: 'cover'
     }
