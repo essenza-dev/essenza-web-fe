@@ -42,7 +42,6 @@ const fuzzyFilter = (row, columnId, value, addMeta) => {
   return itemRank.passed
 }
 
-// Column helper
 const columnHelper = createColumnHelper()
 
 const BannerPage = () => {

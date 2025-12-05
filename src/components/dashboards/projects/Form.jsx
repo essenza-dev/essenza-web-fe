@@ -25,15 +25,13 @@ import CustomTextField from '@/@core/components/custom-inputs/TextField'
 import FormActions from '@/components/FormActions'
 import BackdropLoading from '@/components/BackdropLoading'
 
-// Asumsi: handleApiResponse berfungsi dengan baik
 import { handleApiResponse } from '@/utils/handleApiResponse'
 
-// --- 1. DATA DEFAULT ---
 const defaultData = {
   title: '',
   location: '',
   description: '',
-  image: '', // Akan menampung File Object (saat baru) atau URL string (saat load data lama)
+  image: '',
   gallery: [],
   meta_title: '',
   meta_description: '',
@@ -42,7 +40,6 @@ const defaultData = {
   is_active: true
 }
 
-// --- 2. KOMPONEN HELPER IMAGE UPLOADER ---
 const ImageUploader = ({ preview, onFileChange, onRemove }) => (
   <Grid item xs={12}>
     <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
@@ -89,7 +86,6 @@ const ImageUploader = ({ preview, onFileChange, onRemove }) => (
   </Grid>
 )
 
-// --- 3. KOMPONEN UTAMA PROJECT FORM ---
 const ProjectForm = ({ id }) => {
   const router = useRouter()
   const { success, error, SnackbarComponent } = useSnackbar()
@@ -118,7 +114,6 @@ const ProjectForm = ({ id }) => {
     []
   )
 
-  // --- HANDLERS ---
   const handleChange = useCallback(e => {
     const { name, value } = e.target
 
@@ -137,7 +132,6 @@ const ProjectForm = ({ id }) => {
 
       setPreview(imageUrl)
 
-      // Simpan File Object ke state data
       setData(prev => ({ ...prev, image: file }))
     }
   }, [])
@@ -145,70 +139,57 @@ const ProjectForm = ({ id }) => {
   const handleRemoveImage = useCallback(() => {
     setPreview('')
 
-    // Set image ke string kosong, yang akan ditangani di handleSubmit
     setData(prev => ({ ...prev, image: '' }))
   }, [])
 
-  // --- LOGIC FETCH DATA ---
-  const fetchProject = async id => {
-    setLoading(true) // Mulai loading saat fetching
+  const fetchProject = useCallback(
+    async id => {
+      setLoading(true)
 
-    try {
-      const res = await getProjectById(id)
+      try {
+        const res = await getProjectById(id)
 
-      setData(res.data)
+        setData(res.data)
 
-      if (res.data?.image) {
-        setPreview(res.data.image) // Set preview ke URL lama
+        if (res.data?.image) {
+          setPreview(res.data.image)
+        }
+      } catch {
+        error('Failed to load project details.')
+      } finally {
+        setLoading(false)
       }
-    } catch {
-      error('Failed to load social media')
-    } finally {
-      setLoading(false) // Selesai loading
-    }
-  }
+    },
+    [error]
+  )
 
   useEffect(() => {
-    setPreview('') // Reset preview saat ID berubah
+    setPreview('')
     if (id) fetchProject(id)
-  }, [id])
+  }, [id, fetchProject])
 
-  // --- LOGIC SUBMIT (KUNCI PERBAIKAN) ---
   const handleSubmit = async e => {
     e.preventDefault()
     setLoading(true)
 
-    // 1. Buat FormData
     const formData = new FormData()
 
-    // 2. Siapkan data tanpa field 'image' dan 'gallery'
-    // Menggunakan data state saat ini.
     const dataToSubmit = { ...data }
 
     delete dataToSubmit.image
     delete dataToSubmit.gallery
 
-    // 3. Tambahkan semua field teks/boolean yang tersisa ke FormData
     Object.keys(dataToSubmit).forEach(key => {
-      // Append value. Konversi boolean ke string 'true'/'false' jika BE memerlukannya
       formData.append(key, dataToSubmit[key] || '')
     })
 
-    // 4. LOGIC IMAGE FILE HANDLING: Hanya tambahkan 'image' jika itu adalah File Object BARU
     if (data.image instanceof File) {
-      // KUNCI: Kirim File Object
       formData.append('image', data.image)
     }
 
-    // JANGAN kirim field 'image' jika isinya URL string (pertahankan gambar lama)
-
-    // Opsional: Handle kasus di mana gambar dihapus (jika BE Anda memerlukannya)
     if (id && data.image === '' && preview.startsWith('http')) {
-      // Kirim sinyal khusus ke BE untuk menghapus gambar lama jika diperlukan
-      // Contoh: formData.append('image_action', 'DELETE');
     }
 
-    // 5. Handle Gallery (jika gallery memiliki File Object baru)
     if (data.gallery && Array.isArray(data.gallery)) {
       data.gallery.forEach((item, index) => {
         if (item instanceof File) {
@@ -217,7 +198,6 @@ const ProjectForm = ({ id }) => {
       })
     }
 
-    // 6. Kirim FormData
     await handleApiResponse(() => (id ? updateProject(id, formData) : createProject(formData)), {
       success: msg => success(msg),
       error: msg => error(msg),
@@ -231,7 +211,6 @@ const ProjectForm = ({ id }) => {
     })
   }
 
-  // --- RENDER ---
   return (
     <>
       <form onSubmit={handleSubmit}>

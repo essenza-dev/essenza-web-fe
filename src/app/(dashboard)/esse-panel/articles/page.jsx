@@ -1,9 +1,10 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useCallback, useEffect } from 'react'
 
 import { useRouter } from 'next/navigation'
 
+import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import Chip from '@mui/material/Chip'
 import CardHeader from '@mui/material/CardHeader'
@@ -20,12 +21,16 @@ import {
   getSortedRowModel
 } from '@tanstack/react-table'
 
+import useSnackbar from '@/@core/hooks/useSnackbar'
+
 import ActionMenu from '@/@core/components/option-menu/ActionMenu'
 import TableGeneric from '@/@core/components/table/Generic'
-import CustomAvatar from '@/@core/components/mui/Avatar'
-import { getInitials } from '@/utils/getInitials'
 import TableHeaderActions from '@/@core/components/table/HeaderActions'
 import DialogBasic from '@/components/DialogBasic'
+import BackdropLoading from '@/components/BackdropLoading'
+import { deleteArticle, getArticles } from '@/services/article'
+
+import { formatDateToCustomStringNative } from '@/utils/helpers'
 
 const fuzzyFilter = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
@@ -35,77 +40,65 @@ const fuzzyFilter = (row, columnId, value, addMeta) => {
   return itemRank.passed
 }
 
-const getAvatar = params => {
-  const { avatar, title } = params
-
-  if (avatar) {
-    return <CustomAvatar src={avatar} skin='light' size={34} />
-  } else {
-    return (
-      <CustomAvatar skin='light' size={34}>
-        {getInitials(title)}
-      </CustomAvatar>
-    )
-  }
-}
-
 const columnHelper = createColumnHelper()
 
-const defaultArticlesData = [
-  {
-    id: 1,
-    title: 'Inovasi Keramik untuk Rumah Modern',
-    slug: 'inovasi-keramik-untuk-rumah-modern',
-    thumbnail: 'https://picsum.photos/seed/keramik1/200/120',
-    tags: ['keramik premium', 'rumah modern', 'teknologi terbaru', 'desain elegan'],
-    author: 'John Doe',
-    publish_at: '2025-01-10 14:30'
-  },
-  {
-    id: 2,
-    title: 'Tips Memilih Keramik untuk Ruang Tamu',
-    slug: 'tips-memilih-keramik-untuk-ruang-tamu',
-    thumbnail: 'https://picsum.photos/seed/keramik2/200/120',
-    tags: ['keramik ruang tamu', 'tips memilih', 'warna netral', 'interior rumah'],
-    author: 'Sarah Lim',
-    publish_at: '2025-02-01 09:12'
-  },
-  {
-    id: 3,
-    title: 'Keramik Outdoor Anti-Slip',
-    slug: 'keramik-outdoor-anti-slip',
-    thumbnail: 'https://picsum.photos/seed/keramik3/200/120',
-    tags: ['keramik outdoor', 'anti slip', 'keamanan taman', 'kolam renang'],
-    author: 'Michael Tan',
-    publish_at: '2025-02-18 16:55'
-  },
-  {
-    id: 4,
-    title: 'Tren Warna Keramik 2025',
-    slug: 'tren-warna-keramik-2025',
-    thumbnail: 'https://picsum.photos/seed/keramik4/200/120',
-    tags: ['tren warna', 'keramik 2025', 'earth tone', 'pastel', 'keramik matte'],
-    author: 'Angela Park',
-    publish_at: '2025-03-02 11:20'
-  },
-  {
-    id: 5,
-    title: 'Cara Merawat Keramik Agar Tetap Mengkilap',
-    slug: 'cara-merawat-keramik-agar-tetap-mengkilap',
-    thumbnail: 'https://picsum.photos/seed/keramik5/200/120',
-    tags: ['perawatan keramik', 'mengkilap', 'tips membersihkan', 'housekeeping'],
-    author: 'Louis Chen',
-    publish_at: '2025-03-15 08:45'
-  }
-]
-
 const ArticlePage = () => {
-  const [data, setData] = useState(defaultArticlesData)
+  const router = useRouter()
+  const { success, error, SnackbarComponent } = useSnackbar()
+
+  const [data, setData] = useState([])
   const [filteredData, setFilteredData] = useState(data)
   const [globalFilter, setGlobalFilter] = useState('')
-  const [selectedId, setSelectedId] = useState('')
-  const [openDelete, setOpenDelete] = useState(false)
-  const router = useRouter()
+  const [deleteId, setDeleteId] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [pagination, setPagination] = useState({ page: 0, page_size: 10 })
+  const [isDataLoading, setIsDataLoading] = useState(true)
+
+  const fetchArticle = useCallback(async () => {
+    setIsDataLoading(true)
+
+    try {
+      const res = await getArticles(pagination)
+
+      if (res?.data) {
+        setData(res.data)
+        setFilteredData(res.data)
+      }
+    } catch (err) {
+      error('Gagal memuat data Artikel.')
+      console.error(err)
+    } finally {
+      setIsDataLoading(false)
+    }
+  }, [error])
+
+  useEffect(() => {
+    fetchArticle()
+  }, [fetchArticle])
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!deleteId) return
+
+    setLoading(true)
+
+    try {
+      const res = await deleteArticle(deleteId)
+
+      if (res?.success) {
+        success('Artikel berhasil dihapus!')
+
+        fetchArticle()
+      } else {
+        error(res?.message || 'Gagal menghapus Artikel!')
+      }
+    } catch (err) {
+      error(err.message || 'Terjadi kesalahan saat menghapus.')
+      console.error(err)
+    } finally {
+      setLoading(false)
+      setDeleteId(null)
+    }
+  }, [deleteId, fetchArticle, success, error])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const actionsData = row => [
@@ -131,8 +124,7 @@ const ArticlePage = () => {
       menuItemProps: {
         className: 'gap-2',
         onClick: () => {
-          setOpenDelete(true)
-          setSelectedId(row.original.id)
+          setDeleteId(row.original.id)
         }
       }
     }
@@ -140,37 +132,99 @@ const ArticlePage = () => {
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor('title', {
+      columnHelper.accessor('thumbnail', {
         header: 'Title',
-        cell: ({ row }) => (
-          <div className='flex items-center gap-4'>
-            {getAvatar({ avatar: row.original.thumbnail, fullName: row.original.title })}
-            <div className='flex flex-col'>
-              <Typography className='font-medium' color='text.primary'>
-                {row.original.title}
-              </Typography>
-              <Typography variant='body2'>{row.original.slug}</Typography>
-            </div>
-          </div>
-        )
+        cell: ({ row }) => {
+          const data = row.original
+
+          console.log('data', data)
+          const thumbnail = data.thumbnail
+          const title = data.title || '-'
+          const slug = data.slug || ''
+
+          return (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box
+                component='img'
+                src={thumbnail || '/images/broken-image.png'}
+                alt={title}
+                onError={e => {
+                  e.target.src = '/images/broken-image.png'
+                }}
+                sx={{ width: 96, height: 48, objectFit: 'cover', borderRadius: 1 }}
+              />
+              <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                <Typography
+                  variant='body2'
+                  sx={{
+                    fontWeight: 600,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: 200
+                  }}
+                >
+                  {title}
+                </Typography>
+                <Typography
+                  variant='caption'
+                  color='text.secondary'
+                  sx={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: 200
+                  }}
+                >
+                  {slug}
+                </Typography>
+              </Box>
+            </Box>
+          )
+        }
       }),
       columnHelper.accessor('tags', {
         header: 'Tags',
         cell: info => {
-          const tags = info.getValue() || []
-          const max = 3
+          const rawValue = info.getValue()
+          let tags = []
 
+          if (typeof rawValue === 'string' && rawValue.trim() !== '') {
+            tags = rawValue
+              .split(',')
+              .map(tag => tag.trim())
+              .filter(tag => tag.length > 0)
+          } else if (Array.isArray(rawValue)) {
+            tags = rawValue
+          }
+
+          const max = 3
           const visibleTags = tags.slice(0, max)
           const extraCount = tags.length - max
 
           return (
-            <div className='flex flex-wrap items-center gap-1 max-w-[250px]'>
-              {visibleTags.map((tag, idx) => (
-                <Chip key={idx} label={tag} size='small' color='info' variant='tonal' />
-              ))}
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                gap: 1,
+                maxWidth: 250
+              }}
+            >
+              {visibleTags.map(
+                (tag, idx) =>
+                  (typeof tag === 'string' || typeof tag === 'number') && (
+                    <Chip key={idx} label={tag} size='small' color='info' variant='tonal' />
+                  )
+              )}
 
-              {extraCount > 0 && <span className='text-gray-500 text-xs ml-1'>... +{extraCount} more</span>}
-            </div>
+              {extraCount > 0 && (
+                <Typography variant='caption' color='text.secondary' sx={{ ml: 0.5, fontSize: '0.75rem' }}>
+                  ... +{extraCount} more
+                </Typography>
+              )}
+            </Box>
           )
         }
       }),
@@ -178,9 +232,11 @@ const ArticlePage = () => {
         header: 'Author',
         cell: info => <Typography className='truncate max-w-[200px]'>{info.getValue()}</Typography>
       }),
-      columnHelper.accessor('publish_at', {
+      columnHelper.accessor('published_at', {
         header: 'Publish at',
-        cell: info => <Typography className='truncate max-w-[200px]'>{info.getValue()}</Typography>
+        cell: info => (
+          <Typography className='truncate max-w-[200px]'>{formatDateToCustomStringNative(info.getValue())}</Typography>
+        )
       }),
       columnHelper.accessor('actions', {
         header: 'Actions',
@@ -193,12 +249,6 @@ const ArticlePage = () => {
     ],
     [actionsData]
   )
-
-  const deleteStore = () => {
-    setData(prev => prev.filter(item => item.id !== selectedId))
-    setFilteredData(prev => prev.filter(item => item.id !== selectedId))
-    setSelectedId('')
-  }
 
   const table = useReactTable({
     data: filteredData,
@@ -231,18 +281,32 @@ const ArticlePage = () => {
           count={table.getFilteredRowModel().rows.length}
           rowsPerPage={table.getState().pagination.pageSize || 10}
           page={table.getState().pagination.pageIndex || 0}
-          onPageChange={(_, page) => table.setPageIndex(page)}
-          onRowsPerPageChange={e => table.setPageSize(Number(e.target.value))}
+          onPageChange={(_, page) => {
+            table.setPageIndex(page)
+            setPagination(prev => ({ ...prev, page }))
+          }}
+          onRowsPerPageChange={e => {
+            const newSize = Number(e.target.value)
+
+            table.setPageSize(newSize)
+            setPagination(prev => ({
+              ...prev,
+              page_size: newSize,
+              page: 0
+            }))
+          }}
           rowsPerPageOptions={[5, 10, 25]}
         />
       </Card>
       <DialogBasic
-        open={openDelete}
-        onClose={() => setOpenDelete(false)}
-        omSubmit={() => deleteStore()}
+        open={deleteId !== null}
+        onClose={() => setDeleteId(null)}
+        onSubmit={handleConfirmDelete}
         title='Delete Article'
-        description='Are you sure you want to delete this article? This action is permanent and cannot be undone.'
+        description='Apakah Anda yakin ingin menghapus artikel ini?'
       />
+      {SnackbarComponent}
+      <BackdropLoading open={loading} />
     </>
   )
 }

@@ -40,7 +40,7 @@ const ProjectsPage = () => {
   const { success, error, SnackbarComponent } = useSnackbar()
 
   const [data, setData] = useState([])
-
+  const [pagination, setPagination] = useState({ page: 0, page_size: 10 })
   const [globalFilter, setGlobalFilter] = useState('')
   const [deleteId, setDeleteId] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -50,7 +50,7 @@ const ProjectsPage = () => {
     setIsDataLoading(true)
 
     try {
-      const res = await getProjects()
+      const res = await getProjects(pagination)
 
       if (res?.data) {
         setData(res.data)
@@ -132,6 +132,9 @@ const ProjectsPage = () => {
               component='img'
               src={info.getValue()}
               alt='Project'
+              onError={e => {
+                e.target.src = '/images/broken-image.png'
+              }}
               sx={{ width: 96, height: 48, objectFit: 'cover', borderRadius: 1 }}
             />
           </Box>
@@ -228,8 +231,6 @@ const ProjectsPage = () => {
           addHref='/esse-panel/projects/add'
           addColor='success'
         />
-
-        <BackdropLoading open={isDataLoading} />
         <TableGeneric table={table} />
         <TablePagination
           component='div'
@@ -238,11 +239,17 @@ const ProjectsPage = () => {
           page={table.getState().pagination.pageIndex}
           onPageChange={(_, page) => {
             table.setPageIndex(page)
+            setPagination(prev => ({ ...prev, page }))
           }}
           onRowsPerPageChange={e => {
             const newSize = Number(e.target.value)
 
             table.setPageSize(newSize)
+            setPagination(prev => ({
+              ...prev,
+              page_size: newSize,
+              page: 0
+            }))
           }}
           rowsPerPageOptions={[5, 10, 25]}
         />

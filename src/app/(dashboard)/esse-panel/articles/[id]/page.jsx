@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 import { useParams, useRouter } from 'next/navigation'
 
 import Card from '@mui/material/Card'
+import Chip from '@mui/material/Chip'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
 import Divider from '@mui/material/Divider'
@@ -12,82 +13,76 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 
+import useSnackbar from '@/@core/hooks/useSnackbar'
+
 import { getArticleById, deleteArticle } from '@/services/article'
+
+import { formatDateToCustomStringNative } from '@/utils/helpers'
 
 import DetailField from '@/components/DetailField'
 import DetailActions from '@/components/DetailActions'
-
-export const article = {
-  id: 1,
-  title: 'Meningkatkan Penjualan Online dengan Strategi Konten',
-  slug: 'meningkatkan-penjualan-online-dengan-strategi-konten',
-  tags: ['marketing', 'business', 'growth'], // maks 3
-  excerpt: 'Pelajari bagaimana strategi konten yang tepat mampu meningkatkan penjualan online Anda secara signifikan.',
-  author: 'Admin',
-  created_at: '2025-01-14',
-  published_at: '2025-01-14',
-  banner: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=1200',
-  readingTime: '6 min read',
-  content: `
-    <h2>Kenapa Strategi Konten Penting?</h2>
-    <p>
-      Dalam dunia digital, konten adalah jembatan antara bisnis dan pelanggan.
-      Konten yang tepat dapat meningkatkan awareness, engagement, hingga konversi.
-    </p>
-
-    <h3>1. Riset Audiens</h3>
-    <p>
-      Langkah pertama adalah memahami siapa target audiens Anda. Pahami kebutuhan,
-      masalah, dan perilaku mereka.
-    </p>
-
-    <h3>2. Gunakan Konten dengan Nilai Tinggi</h3>
-    <p>
-      Konten yang memberikan solusi nyata memiliki peluang lebih besar untuk disimpan,
-      dibagikan, dan dikonsumsi kembali.
-    </p>
-
-    <blockquote>
-      "Konten yang baik adalah konten yang membuat orang merasa lebih pintar setelah membacanya."
-    </blockquote>
-
-    <h3>3. Konsistensi adalah Kunci</h3>
-    <p>
-      Tidak peduli seberapa bagus konten Anda, jika tidak konsisten, audiens akan mudah melupakan brand Anda.
-    </p>
-
-    <h3>Kesimpulan</h3>
-    <p>
-      Dengan strategi konten yang tepat, bisnis online dapat berkembang lebih cepat dan stabil.
-      Mulailah dari memahami audiens, membuat konten bernilai, dan jaga konsistensi.
-    </p>
-  `
-}
+import BackdropLoading from '@/components/BackdropLoading'
 
 const ArticleDetailPage = () => {
   const { id } = useParams()
   const router = useRouter()
-  const [store, setStore] = useState(null)
+  const { success, error, SnackbarComponent } = useSnackbar()
+
+  const [article, setArticle] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (id) {
-      getArticleById(id)
-        .then(data => setStore(data))
-        .finally(() => setLoading(false))
+    const fetchArticle = async () => {
+      try {
+        const res = await getArticleById(id)
+
+        if (res?.data) {
+          setArticle(res.data)
+        }
+      } catch (err) {
+        console.error('Failed to fetch article:', err)
+      } finally {
+        setLoading(false)
+      }
     }
+
+    if (id) fetchArticle()
   }, [id])
 
-  const handleDelete = async () => {
-    if (confirm('Delete this Store?')) {
-      await deleteArticle(id)
-      alert('Deleted successfully!')
-      router.push('/esse-panel/stores')
+  const convertStringtoArray = rawValue => {
+    let tags = []
+
+    if (typeof rawValue === 'string' && rawValue.trim() !== '') {
+      tags = rawValue
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(tag => tag.length > 0)
+    } else if (Array.isArray(rawValue)) {
+      tags = rawValue
     }
+
+    return tags
   }
 
-  if (loading) return <p className='p-6'>Loading...</p>
-  if (!store) return <p className='p-6'>Store not found</p>
+  const handleDelete = useCallback(async () => {
+    setLoading(true)
+
+    try {
+      await deleteArticle(id)
+
+      success('Berhasil dihapus!')
+      setTimeout(() => {
+        router.push('/esse-panel/articles')
+      }, 2000)
+      router.push('/esse-panel/articles')
+    } catch (err) {
+      console.error('Delete failed:', err)
+      error('Gagal menghapus: ' + (err.message || 'Terjadi kesalahan server.'))
+      setLoading(false)
+    }
+  }, [id, success, error, router])
+
+  if (!article) return <p className='p-6'>Article not found</p>
 
   return (
     <div className='p-6'>
@@ -99,25 +94,37 @@ const ArticleDetailPage = () => {
             <DetailField label='Title' value={article.title} />
             <DetailField label='Slug' value={article.slug} />
             <DetailField label='Author' value={article.author} />
-            <DetailField label='Status' value={article.is_active ? 'Active' : 'Inactive'} />
-            <DetailField label='Published At' value={article.published_at} />
-            <DetailField label='Created At' value={article.created_at} />
-            <DetailField label='Updated At' value={article.updated_at} />
+            <DetailField
+              label='Status'
+              value={
+                article.is_active ? (
+                  <Chip label='Active' size='small' color='success' variant='tonal' className='self-start rounded' />
+                ) : (
+                  <Chip label='Inactive' size='small' color='error' variant='tonal' className='self-start rounded' />
+                )
+              }
+            />
+            <DetailField label='Published At' value={formatDateToCustomStringNative(article.published_at)} />
+            <DetailField label='Created At' value={formatDateToCustomStringNative(article.created_at)} />
+            <DetailField label='Updated At' value={formatDateToCustomStringNative(article.updated_at)} />
             <DetailField label='Meta Title' value={article.meta_title} />
             <DetailField label='Meta Description' value={article.meta_description} xs={12} />
             <DetailField label='Meta Keywords' value={article.meta_keywords} xs={12} />
-
-            {/* Tags */}
             <Grid item xs={12}>
               <Typography variant='subtitle2' className='mb-2'>
                 Tags
               </Typography>
-              {article.tags?.length ? (
+              {convertStringtoArray(article.tags)?.length ? (
                 <Box className='flex gap-2 flex-wrap'>
-                  {article.tags.map((tag, index) => (
-                    <span key={index} className='px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs border'>
-                      {tag}
-                    </span>
+                  {convertStringtoArray(article.tags).map((tag, index) => (
+                    <Chip
+                      key={index}
+                      label={tag}
+                      size='small'
+                      color='info'
+                      variant='tonal'
+                      className='self-start rounded'
+                    />
                   ))}
                 </Box>
               ) : (
@@ -126,8 +133,6 @@ const ArticleDetailPage = () => {
                 </Typography>
               )}
             </Grid>
-
-            {/* Thumbnail */}
             <Grid item xs={12}>
               <Typography variant='subtitle2' className='mb-2'>
                 Thumbnail
@@ -164,8 +169,16 @@ const ArticleDetailPage = () => {
           </Grid>
         </CardContent>
         <Divider />
-        <DetailActions id={id} href='articles' />
+        <DetailActions
+          id={id}
+          href='articles'
+          onConfirm={() => {
+            handleDelete()
+          }}
+        />
       </Card>
+      {SnackbarComponent}
+      <BackdropLoading open={loading} />
     </div>
   )
 }

@@ -147,7 +147,6 @@ const ProjectDetailPage = () => {
         <DetailActions
           id={id}
           href='projects'
-          onDelete={handleDelete}
           onConfirm={() => {
             handleDelete()
           }}

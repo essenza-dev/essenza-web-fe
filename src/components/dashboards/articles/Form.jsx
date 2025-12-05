@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -10,6 +10,11 @@ import CardHeader from '@mui/material/CardHeader'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import IconButton from '@mui/material/IconButton'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Switch from '@mui/material/Switch'
 
 import { useEditor, EditorContent } from '@tiptap/react'
 import { StarterKit } from '@tiptap/starter-kit'
@@ -20,17 +25,20 @@ import { TextAlign } from '@tiptap/extension-text-align'
 import { getArticleById, createArticle, updateArticle } from '@/services/article'
 import CustomTextField from '@/@core/components/custom-inputs/TextField'
 
+import useSnackbar from '@/@core/hooks/useSnackbar'
+
 import EditorToolbar from '@/@core/components/editor/EditorToolbar'
 
 import '@/libs/styles/tiptapEditor.css'
 import FormActions from '@/components/FormActions'
+import BackdropLoading from '@/components/BackdropLoading'
+import { handleApiResponse } from '@/utils/handleApiResponse'
 
 const defaultData = {
   title: '',
   slug: '',
   tags: '',
   thumbnail: '',
-  author: '',
   meta_title: '',
   meta_description: '',
   meta_keywords: '',
@@ -39,10 +47,60 @@ const defaultData = {
   content: ''
 }
 
+const ImageUploader = ({ preview, onFileChange, onRemove }) => (
+  <Grid item sm={6}>
+    <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
+      Thumbnail Article
+    </Typography>
+
+    {preview ? (
+      <Box sx={{ position: 'relative', display: 'inline-block' }}>
+        <Box
+          component='img'
+          src={preview}
+          alt='Preview'
+          sx={{ width: 220, height: 120, objectFit: 'cover', borderRadius: 1, border: '1px solid #ccc' }}
+        />
+        <IconButton
+          color='error'
+          size='small'
+          onClick={onRemove}
+          sx={{
+            position: 'absolute',
+            top: 4,
+            right: 4,
+            backgroundColor: 'white',
+            boxShadow: 1,
+            '&:hover': { backgroundColor: '#f5f5f5' }
+          }}
+        >
+          <i className='ri-delete-bin-line' style={{ color: '#f44336', fontSize: '18px' }} />
+        </IconButton>
+      </Box>
+    ) : (
+      <Button
+        variant='outlined'
+        component='label'
+        sx={{ width: { xs: '100%', sm: 'auto' } }}
+        size='small'
+        startIcon={<i className='ri-upload-2-line' style={{ fontSize: '18px' }} />}
+        color='primary'
+      >
+        Upload Image
+        <input type='file' hidden accept='image/*' onChange={onFileChange} />
+      </Button>
+    )}
+  </Grid>
+)
+
 const ArticleForm = ({ id }) => {
   const router = useRouter()
   const isEdit = !!id
   const [data, setData] = useState(defaultData)
+  const [loading, setLoading] = useState(false)
+  const [preview, setPreview] = useState('')
+
+  const { success, error, SnackbarComponent } = useSnackbar()
 
   const editor = useEditor({
     extensions: [
@@ -66,10 +124,6 @@ const ArticleForm = ({ id }) => {
       { name: 'title', label: 'Title', size: 6, required: true },
       { name: 'slug', label: 'Slug', size: 6, required: true },
       { name: 'tags', label: 'Tags', placeholder: 'tag1, tag2, tag3', size: 6 },
-      { name: 'author', label: 'Author', size: 6 },
-
-      { name: 'thumbnail', label: 'Thumbnail URL', size: 12 },
-
       { name: 'meta_title', label: 'Meta Title', size: 6 },
       {
         name: 'meta_description',
@@ -84,92 +138,157 @@ const ArticleForm = ({ id }) => {
         size: 12,
         multiline: true,
         rows: 2
-      },
-      {
-        name: 'published_at',
-        label: 'Publish Date',
-        type: 'datetime-local',
-        size: 6
-      },
-      {
-        name: 'is_active',
-        label: 'Status',
-        type: 'select',
-        size: 6,
-        options: [
-          { label: 'Active', value: true },
-          { label: 'Inactive', value: false }
-        ]
       }
     ],
     []
   )
 
-  useEffect(() => {
-    if (isEdit) {
-      getArticleById(id).then(article => {
-        setData(article)
-        editor?.commands.setContent(article.content || '')
-      })
-    }
-  }, [id, editor])
-
-  const handleChange = e => {
+  const handleChange = useCallback(e => {
     const { name, value } = e.target
 
     setData(prev => ({ ...prev, [name]: value }))
-  }
+  }, [])
+
+  const handleSwitchChange = useCallback(e => {
+    setData(prev => ({ ...prev, is_active: e.target.checked }))
+  }, [])
+
+  const handleImageChange = useCallback(e => {
+    const file = e.target.files[0]
+
+    if (file) {
+      const imageUrl = URL.createObjectURL(file)
+
+      setPreview(imageUrl)
+
+      setData(prev => ({ ...prev, thumbnail: file }))
+    }
+  }, [])
+
+  const handleRemoveImage = useCallback(() => {
+    setPreview('')
+
+    setData(prev => ({ ...prev, thumbnail: '' }))
+  }, [])
+
+  const fetchArticle = useCallback(
+    async id => {
+      setLoading(true)
+
+      try {
+        const res = await getArticleById(id)
+
+        setData(res.data)
+
+        if (res.data?.thumbnail) {
+          setPreview(res.data.thumbnail)
+        }
+
+        if (editor && res.data?.content) {
+          editor.commands.setContent(res.data.content, false)
+        }
+      } catch {
+        error('Failed to load project details.')
+      } finally {
+        setLoading(false)
+      }
+    },
+    [error]
+  )
+
+  useEffect(() => {
+    setPreview('')
+    if (id) fetchArticle(id)
+  }, [id, fetchArticle])
 
   const handleSubmit = async e => {
     e.preventDefault()
+    setLoading(true)
+    const formData = new FormData()
+    const dataToSubmit = { ...data }
 
-    try {
-      if (isEdit) {
-        await updateArticle(id, data)
-        alert('Article updated!')
-      } else {
-        await createArticle(data)
-        alert('Article added!')
-      }
+    delete dataToSubmit.thumbnail
+    delete dataToSubmit.gallery
 
-      router.push('/esse-panel/articles')
-    } catch (err) {
-      console.error('❌ Error:', err)
+    Object.keys(dataToSubmit).forEach(key => {
+      formData.append(key, dataToSubmit[key] || '')
+    })
+
+    if (data.thumbnail instanceof File) {
+      formData.append('thumbnail', data.thumbnail)
     }
+
+    if (id && data.thumbnail === '' && preview.startsWith('http')) {
+    }
+
+    if (data.gallery && Array.isArray(data.gallery)) {
+      data.gallery.forEach((item, index) => {
+        if (item instanceof File) {
+          formData.append(`gallery[${index}]`, item)
+        }
+      })
+    }
+
+    await handleApiResponse(() => (id ? updateArticle(id, formData) : createArticle(formData)), {
+      success: msg => success(msg),
+      error: msg => error(msg),
+      onSuccess: () =>
+        setTimeout(() => {
+          router.push('/esse-panel/articles')
+        }, 2000),
+      onError: () => {
+        setLoading(false)
+      }
+    })
   }
 
   return (
-    <Card className='shadow'>
-      <form onSubmit={handleSubmit} className='space-y-4'>
-        <CardHeader title={isEdit ? 'Edit Article' : 'Add Article'} />
-        <Divider />
-        <CardContent>
-          <Grid container spacing={3}>
-            {fields.map(field => (
-              <CustomTextField
-                key={field.name}
-                {...field}
-                type={field.type || 'text'}
-                value={data[field.name] ?? ''}
-                onChange={handleChange}
-                select={field.type === 'select'}
-                options={field.options}
-              />
-            ))}
-          </Grid>
-          <Typography className='mt-6 mb-2'>Content</Typography>
-          <Card className='p-0 border shadow-none'>
-            <CardContent className='p-0'>
-              <EditorToolbar editor={editor} />
-              <Divider className='my-2' />
-              <EditorContent editor={editor} className='min-h-[250px] p-3 border rounded' />
-            </CardContent>
-          </Card>
-        </CardContent>
-        <Divider />
-        <FormActions onCancel={() => router.push('/esse-panel/articles')} isEdit={isEdit} />
-      </form>
-    </Card>
+    <>
+      <Card className='shadow'>
+        <form onSubmit={handleSubmit} className='space-y-4'>
+          <CardHeader title={isEdit ? 'Edit Article' : 'Add Article'} />
+          <Divider />
+          <CardContent>
+            <Grid container spacing={5}>
+              {fields.map(field => (
+                <CustomTextField
+                  key={field.name}
+                  {...field}
+                  type={field.type || 'text'}
+                  value={data[field.name] ?? ''}
+                  onChange={handleChange}
+                  select={field.type === 'select'}
+                  options={field.options}
+                />
+              ))}
+              <ImageUploader preview={preview} onFileChange={handleImageChange} onRemove={handleRemoveImage} />
+              <Grid item sm={6}>
+                <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
+                  Status
+                </Typography>
+                <FormControlLabel
+                  control={<Switch checked={data.is_active} onChange={handleSwitchChange} />}
+                  label={data?.is_active ? 'Active' : 'Inactive'}
+                />
+              </Grid>
+            </Grid>
+
+            <Typography className='mt-6 mb-2'>Content</Typography>
+            <Card className='p-0 border shadow-none'>
+              <CardContent className='p-0'>
+                <EditorToolbar editor={editor} />
+                <Divider className='my-2' />
+                <EditorContent editor={editor} className='min-h-[250px] p-3 border rounded' />
+              </CardContent>
+            </Card>
+          </CardContent>
+          <Divider />
+          <FormActions onCancel={() => router.push('/esse-panel/articles')} isEdit={isEdit} />
+        </form>
+      </Card>
+      {SnackbarComponent}
+      <BackdropLoading open={loading} />
+    </>
   )
 }
 
