@@ -73,11 +73,12 @@ const productFeatures = [
 
 const styles = {
   gridContainer: {
-    margin: '56px 0'
+    margin: '56px 0',
+    width: '100%'
   },
   boxImg: {
-    height: { xs: 'auto', sm: '460px' },
-    width: { xs: '100%', sm: '460px' },
+    height: { xs: '327px', sm: '460px' },
+    width: { xs: '327px', sm: '460px' },
     objectFit: 'cover',
     borderRadius: '6px'
   },
@@ -105,7 +106,11 @@ const styles = {
   },
   boxButton: {
     width: '240px',
-    mt: 3
+    mt: 3,
+    '& button': {
+      padding: { xs: '10px !important' },
+      fontSize: { xs: '12px', sm: '16px' }
+    }
   },
   boxTitleSpec: {
     display: 'flex',
@@ -170,11 +175,15 @@ const ProductDetailSection = () => {
                 In Every Surfaces
               </Typography>
               <Box mt={8} />
-              <Box sx={styles.boxButton}>
-                <CustomButton borderColor='#BB8B05'>Request a Sample</CustomButton>
-              </Box>
-              <Box sx={styles.boxButton}>
-                <CustomButton borderColor='#BB8B05'>Download All Catalogue</CustomButton>
+              <Box sx={{ display: 'flex', flexDirection: { xs: 'row', sm: 'column' }, gap: { xs: 2, sm: 2 } }}>
+                <Box sx={styles.boxButton}>
+                  <CustomButton borderColor='#BB8B05'>Request a Sample</CustomButton>
+                </Box>
+                <Box sx={styles.boxButton}>
+                  <CustomButton borderColor='#BB8B05'>
+                    {isMobile ? 'Download Catalogue' : 'Download All Catalogue'}
+                  </CustomButton>
+                </Box>
               </Box>
             </Grid>
             <Grid item sm={6} xs={12}>
