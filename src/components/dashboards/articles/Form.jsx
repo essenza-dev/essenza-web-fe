@@ -196,11 +196,6 @@ const ArticleForm = ({ id }) => {
     [error]
   )
 
-  useEffect(() => {
-    setPreview('')
-    if (id) fetchArticle(id)
-  }, [id, fetchArticle])
-
   const handleSubmit = async e => {
     e.preventDefault()
     setLoading(true)
@@ -241,6 +236,11 @@ const ArticleForm = ({ id }) => {
       }
     })
   }
+
+  useEffect(() => {
+    setPreview('')
+    if (id) fetchArticle(id)
+  }, [id, fetchArticle])
 
   return (
     <>

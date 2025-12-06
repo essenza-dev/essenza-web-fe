@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -24,6 +24,11 @@ import {
 import ActionMenu from '@/@core/components/option-menu/ActionMenu'
 import TableGeneric from '@/@core/components/table/Generic'
 import TableHeaderActions from '@/@core/components/table/HeaderActions'
+import BackdropLoading from '@/components/BackdropLoading'
+
+import useSnackbar from '@/@core/hooks/useSnackbar'
+import DialogBasic from '@/components/DialogBasic'
+import { deleteDistributor, getDistributors } from '@/services/distributors'
 
 const fuzzyFilter = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
@@ -33,54 +38,18 @@ const fuzzyFilter = (row, columnId, value, addMeta) => {
   return itemRank.passed
 }
 
-const defaultDistributors = [
-  {
-    id: 1,
-    name: 'PT Nusantara Bangun Sejahtera',
-    address: 'Jl. Meruya Raya No. 5, Jakarta Barat',
-    phone: '+62 812-3456-7890',
-    email: 'info@nusantarabangun.com',
-    website: 'https://nusantarabangun.com',
-    latitude: -6.2,
-    longitude: 106.785,
-    created_at: '2025-01-15 09:00'
-  },
-  {
-    id: 2,
-    name: 'CV Sinar Terang Jaya',
-    address: 'Jl. Gatot Subroto No. 12, Bandung',
-    phone: '+62 821-1111-2222',
-    email: 'contact@sinarterangjaya.co.id',
-    website: 'https://sinarterangjaya.co.id',
-    latitude: -6.914744,
-    longitude: 107.60981,
-    created_at: '2025-02-01 10:30'
-  },
-  {
-    id: 3,
-    name: 'UD Maju Bersama',
-    address: 'Jl. Diponegoro No. 45, Surabaya',
-    phone: '+62 822-2222-3333',
-    email: 'sales@majubersama.id',
-    website: 'https://majubersama.id',
-    latitude: -7.257472,
-    longitude: 112.75209,
-    created_at: '2025-02-28 13:45'
-  }
-]
-
 const columnHelper = createColumnHelper()
 
 const DistributorsPage = () => {
-  const [data, setData] = useState(defaultDistributors)
+  const [data, setData] = useState([])
+  const [pagination, setPagination] = useState({ page: 0, page_size: 10 })
   const [filteredData, setFilteredData] = useState(data)
   const [globalFilter, setGlobalFilter] = useState('')
-  const router = useRouter()
+  const [deleteIndex, setDeleteIndex] = useState(null)
+  const [loading, setLoading] = useState(false)
 
-  const deleteDistributor = id => {
-    setData(prev => prev.filter(item => item.id !== id))
-    setFilteredData(prev => prev.filter(item => item.id !== id))
-  }
+  const router = useRouter()
+  const { success, error, SnackbarComponent } = useSnackbar()
 
   const actionsData = row => [
     {
@@ -104,7 +73,7 @@ const DistributorsPage = () => {
       icon: <i className='ri-delete-bin-line text-red-500' />,
       menuItemProps: {
         className: 'gap-2',
-        onClick: () => deleteDistributor(row.original.id)
+        onClick: () => setDeleteIndex(row.original.id)
       }
     }
   ]
@@ -163,29 +132,90 @@ const DistributorsPage = () => {
     getPaginationRowModel: getPaginationRowModel()
   })
 
+  const fetchDistributor = async () => {
+    const res = await getDistributors(pagination)
+
+    if (res?.data) {
+      setData(res.data)
+      setFilteredData(res.data)
+    }
+  }
+
+  const confirmDelete = async () => {
+    setLoading(true)
+
+    try {
+      const res = await deleteDistributor(deleteIndex)
+
+      if (res?.success) {
+        success('Deleted successfully!')
+        fetchDistributor()
+      }
+    } catch {
+      error('Delete failed!')
+    } finally {
+      setDeleteIndex(null)
+
+      setLoading(false)
+    }
+
+    setDeleteIndex(null)
+  }
+
+  useEffect(() => {
+    fetchDistributor()
+  }, [])
+
+  useEffect(() => {
+    fetchDistributor()
+  }, [pagination])
+
   return (
-    <Card>
-      <CardHeader title='Distributor Management' className='p-4' />
-      <Divider />
-      <TableHeaderActions
-        searchPlaceholder='Search Distributor'
-        searchValue={globalFilter ?? ''}
-        onSearchChange={setGlobalFilter}
-        addLabel='Add Distributor'
-        addHref='/esse-panel/distributors/add'
-        addColor='success'
+    <>
+      <Card>
+        <CardHeader title='Distributor Management' className='p-4' />
+        <Divider />
+        <TableHeaderActions
+          searchPlaceholder='Search Distributor'
+          searchValue={globalFilter ?? ''}
+          onSearchChange={setGlobalFilter}
+          addLabel='Add Distributor'
+          addHref='/esse-panel/distributors/add'
+          addColor='success'
+        />
+        <TableGeneric table={table} />
+        <TablePagination
+          component='div'
+          count={table.getFilteredRowModel().rows.length}
+          rowsPerPage={table.getState().pagination.pageSize || 10}
+          page={table.getState().pagination.pageIndex || 0}
+          onPageChange={(_, page) => {
+            table.setPageIndex(page)
+            setPagination(prev => ({ ...prev, page }))
+          }}
+          onRowsPerPageChange={e => {
+            const newSize = Number(e.target.value)
+
+            table.setPageSize(newSize)
+            setPagination(prev => ({
+              ...prev,
+              page_size: newSize,
+              page: 0
+            }))
+          }}
+          rowsPerPageOptions={[5, 10, 25]}
+        />
+      </Card>
+      <DialogBasic
+        open={deleteIndex !== null}
+        onClose={() => setDeleteIndex(null)}
+        onSubmit={confirmDelete}
+        title='Delete Distributor'
+        description='Are you sure to delete this distributor?'
       />
-      <TableGeneric table={table} />
-      <TablePagination
-        component='div'
-        count={table.getFilteredRowModel().rows.length}
-        rowsPerPage={table.getState().pagination.pageSize || 10}
-        page={table.getState().pagination.pageIndex || 0}
-        onPageChange={(_, page) => table.setPageIndex(page)}
-        onRowsPerPageChange={e => table.setPageSize(Number(e.target.value))}
-        rowsPerPageOptions={[5, 10, 25]}
-      />
-    </Card>
+      {SnackbarComponent}
+      <BackdropLoading open={loading} />
+    </>
   )
 }
 

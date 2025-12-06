@@ -24,6 +24,8 @@ import { object, minLength, string, pipe, nonEmpty } from 'valibot'
 import classnames from 'classnames'
 
 // Component Imports
+import { CircularProgress } from '@mui/material'
+
 import Illustrations from '@components/Illustrations'
 
 // Config Imports
@@ -48,6 +50,7 @@ const Login = ({ mode }) => {
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
   const [errorState, setErrorState] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   // Vars
   const darkImg = '/images/pages/auth-v2-mask-dark.png'
@@ -83,6 +86,7 @@ const Login = ({ mode }) => {
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
   const onSubmit = async data => {
+    setLoading(true)
     setErrorState(null)
 
     const res = await createAuthToken({
@@ -92,6 +96,7 @@ const Login = ({ mode }) => {
 
     if (!res.success) {
       setErrorState({ message: [res.message] })
+      setLoading(false)
 
       return
     }
@@ -156,6 +161,7 @@ const Login = ({ mode }) => {
                   autoFocus
                   type='text'
                   label='Email/Username'
+                  disabled={loading}
                   onChange={e => {
                     field.onChange(e.target.value)
                     errorState !== null && setErrorState(null)
@@ -177,6 +183,7 @@ const Login = ({ mode }) => {
                   fullWidth
                   label='Password'
                   id='login-password'
+                  disabled={loading}
                   type={isPasswordShown ? 'text' : 'password'}
                   onChange={e => {
                     field.onChange(e.target.value)
@@ -202,13 +209,13 @@ const Login = ({ mode }) => {
               )}
             />
             <div className='flex justify-between items-center flex-wrap gap-x-3 gap-y-1'>
-              <FormControlLabel control={<Checkbox defaultChecked />} label='Remember me' />
+              <FormControlLabel control={<Checkbox defaultChecked />} label='Remember me' disabled={loading} />
               <Typography className='text-end' color='primary' component={Link} href='/esse-panel/forgot-password'>
                 Forgot password?
               </Typography>
             </div>
-            <Button fullWidth variant='contained' type='submit'>
-              Log In
+            <Button fullWidth variant='contained' type='submit' disabled={loading}>
+              {loading ? <CircularProgress size={20} sx={{ color: '#2b2b2b' }} /> : 'Log In'}
             </Button>
           </form>
         </div>

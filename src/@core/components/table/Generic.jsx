@@ -3,6 +3,7 @@ import { flexRender } from '@tanstack/react-table'
 import tableStyles from '@core/styles/table.module.css'
 
 const TableGeneric = ({ table, columns }) => {
+  const totalColumns = table.getVisibleFlatColumns().length;
   return (
     <div className='overflow-x-auto'>
       <table className={tableStyles.table}>
@@ -20,7 +21,7 @@ const TableGeneric = ({ table, columns }) => {
         <tbody>
           {table.getRowModel().rows.length === 0 ? (
             <tr>
-              <td colSpan={columns?.length ?? 1} className='text-center'>
+              <td colSpan={totalColumns} className='text-center' style={{ textAlign: 'center' }}>
                 No data available
               </td>
             </tr>

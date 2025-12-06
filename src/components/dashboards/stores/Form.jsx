@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -14,6 +14,10 @@ import CustomTextField from '@/@core/components/custom-inputs/TextField'
 
 import { getStoreById, updateStore, createStore } from '@/services/stores'
 import FormActions from '@/components/FormActions'
+import useSnackbar from '@/@core/hooks/useSnackbar'
+
+import BackdropLoading from '@/components/BackdropLoading'
+import { handleApiResponse } from '@/utils/handleApiResponse'
 
 const defaultData = {
   name: '',
@@ -29,10 +33,13 @@ const StoreForm = ({ id }) => {
   const isEdit = !!id
 
   const [data, setData] = useState(defaultData)
+  const [loading, setLoading] = useState(false)
+
+  const { success, error, SnackbarComponent } = useSnackbar()
 
   const fields = useMemo(() => [
     { name: 'name', label: 'Name', placeholder: 'Store Name', size: 6, required: true },
-    { name: 'phone', label: 'Phone', placeholder: '081234567890', size: 6, required: true },
+    { name: 'phone', label: 'Phone', placeholder: '+6281234567890', size: 6, required: true },
     { name: 'email', label: 'Email', placeholder: 'store@email.com', size: 6, required: true },
     {
       name: 'address',
@@ -61,45 +68,69 @@ const StoreForm = ({ id }) => {
 
   const handleSubmit = async e => {
     e.preventDefault()
+    setLoading(true)
 
-    try {
-      if (isEdit) {
-        await updateStore(id, Data)
-        alert('Store updated successfully!')
-      } else {
-        await createStore(Data)
-        alert('Store added successfully!')
+    await handleApiResponse(() => (id ? updateStore(id, data) : createStore(data)), {
+      success: msg => success(msg),
+      error: msg => error(msg),
+      onSuccess: () =>
+        setTimeout(() => {
+          router.push('/esse-panel/stores')
+        }, 2000),
+      onError: () => {
+        setLoading(false)
       }
-
-      router.push('/esse-panel/Stores')
-    } catch (err) {
-      console.error('❌ Error saving Store:', err)
-    }
+    })
   }
 
+  const fetchStore = useCallback(
+    async id => {
+      setLoading(true)
+
+      try {
+        const res = await getStoreById(id)
+
+        setData(res.data)
+      } catch {
+        error('Failed to load store details.')
+      } finally {
+        setLoading(false)
+      }
+    },
+    [error]
+  )
+
+  useEffect(() => {
+    if (id) fetchStore(id)
+  }, [id, fetchStore])
+
   return (
-    <Card className='shadow'>
-      <form onSubmit={handleSubmit} className='space-y-4'>
-        <CardHeader title={isEdit ? 'Edit Store' : 'Add Store'} />
-        <Divider />
-        <CardContent>
-          <Grid container spacing={3}>
-            {fields.map(field => (
-              <CustomTextField
-                key={field.name}
-                {...field}
-                type={field.type || 'text'}
-                value={data[field.name] || ''}
-                onChange={handleChange}
-                inputProps={field.type === 'number' ? { min: 1 } : {}}
-              />
-            ))}
-          </Grid>
-        </CardContent>
-        <Divider />
-        <FormActions onCancel={() => router.push('/esse-panel/stores')} isEdit={isEdit} />
-      </form>
-    </Card>
+    <>
+      <Card className='shadow'>
+        <form onSubmit={handleSubmit} className='space-y-4'>
+          <CardHeader title={isEdit ? 'Edit Store' : 'Add Store'} />
+          <Divider />
+          <CardContent>
+            <Grid container spacing={3}>
+              {fields.map(field => (
+                <CustomTextField
+                  key={field.name}
+                  {...field}
+                  type={field.type || 'text'}
+                  value={data[field.name] || ''}
+                  onChange={handleChange}
+                  inputProps={field.type === 'number' ? { min: 1 } : {}}
+                />
+              ))}
+            </Grid>
+          </CardContent>
+          <Divider />
+          <FormActions onCancel={() => router.push('/esse-panel/stores')} isEdit={isEdit} />
+        </form>
+      </Card>
+      {SnackbarComponent}
+      <BackdropLoading open={loading} />
+    </>
   )
 }
 

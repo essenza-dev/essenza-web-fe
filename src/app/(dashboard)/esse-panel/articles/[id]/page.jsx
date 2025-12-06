@@ -73,7 +73,7 @@ const ArticleDetailPage = () => {
       success('Berhasil dihapus!')
       setTimeout(() => {
         router.push('/esse-panel/articles')
-      }, 2000)
+      }, 1000)
       router.push('/esse-panel/articles')
     } catch (err) {
       console.error('Delete failed:', err)
@@ -169,13 +169,7 @@ const ArticleDetailPage = () => {
           </Grid>
         </CardContent>
         <Divider />
-        <DetailActions
-          id={id}
-          href='articles'
-          onConfirm={() => {
-            handleDelete()
-          }}
-        />
+        <DetailActions id={id} href='articles' onConfirm={handleDelete} />
       </Card>
       {SnackbarComponent}
       <BackdropLoading open={loading} />

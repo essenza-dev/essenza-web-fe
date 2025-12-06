@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 import { useParams, useRouter } from 'next/navigation'
 
@@ -11,32 +11,56 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 
 import { getDistributorById, deleteDistributor } from '@/services/distributors'
-import DetailField from '@/components/DetailField' // Komponen reusable yg sudah kamu punya
+import DetailField from '@/components/DetailField'
 import DetailActions from '@/components/DetailActions'
+import useSnackbar from '@/@core/hooks/useSnackbar'
+import BackdropLoading from '@/components/BackdropLoading'
+import { formatDateToCustomStringNative } from '@/utils/helpers'
 
 const DistributorDetailPage = () => {
   const { id } = useParams()
   const router = useRouter()
+  const { success, error, SnackbarComponent } = useSnackbar()
+
   const [distributor, setDistributor] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (id) {
-      getDistributorById(id)
-        .then(data => setDistributor(data))
-        .finally(() => setLoading(false))
+    const fetchDistributor = async () => {
+      try {
+        const res = await getDistributorById(id)
+
+        if (res?.data) {
+          setDistributor(res.data)
+        }
+      } catch (err) {
+        console.error('Failed to fetch distributor:', err)
+      } finally {
+        setLoading(false)
+      }
     }
+
+    if (id) fetchDistributor()
   }, [id])
 
-  const handleDelete = async () => {
-    if (confirm('Are you sure to delete this distributor?')) {
-      await deleteDistributor(id)
-      alert('Distributor deleted!')
-      router.push('/esse-panel/distributors')
-    }
-  }
+  const handleDelete = useCallback(async () => {
+    setLoading(true)
 
-  if (loading) return <p className='p-6'>Loading...</p>
+    try {
+      await deleteDistributor(id)
+
+      success('Berhasil dihapus!')
+      setTimeout(() => {
+        router.push('/esse-panel/distributors')
+      }, 1000)
+      router.push('/esse-panel/distributors')
+    } catch (err) {
+      console.error('Delete failed:', err)
+      error('Gagal menghapus: ' + (err.message || 'Terjadi kesalahan server.'))
+      setLoading(false)
+    }
+  }, [id, success, error, router])
+
   if (!distributor) return <p className='p-6'>Distributor not found.</p>
 
   return (
@@ -53,12 +77,14 @@ const DistributorDetailPage = () => {
             <DetailField label='Website' value={distributor.website} />
             <DetailField label='Latitude' value={distributor.latitude} />
             <DetailField label='Longitude' value={distributor.longitude} />
-            <DetailField label='Created At' value={distributor.created_at} />
+            <DetailField label='Created At' value={formatDateToCustomStringNative(distributor.created_at)} />
           </Grid>
         </CardContent>
         <Divider />
-        <DetailActions id={id} href='ditributors' />
+        <DetailActions id={id} href='distributors' onConfirm={handleDelete} />
       </Card>
+      {SnackbarComponent}
+      <BackdropLoading open={loading} />
     </div>
   )
 }
