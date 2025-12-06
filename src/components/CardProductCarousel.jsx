@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import { useParams } from 'next/navigation'
 
-import { Box, Typography, useMediaQuery } from '@mui/material'
+import { Box, Grid, Typography, useMediaQuery } from '@mui/material'
 
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Autoplay } from 'swiper/modules'
@@ -110,17 +110,23 @@ const styles = {
   }
 }
 
-const defData = [
-  { id: 1, src: '/images/product/sample.jpg', title: 'Banner 1' },
-  { id: 2, src: '/images/product/sample.jpg', title: 'Banner 2' },
-  { id: 3, src: '/images/product/sample.jpg', title: 'Banner 3' },
-  { id: 4, src: '/images/product/sample.jpg', title: 'Banner 4' },
-  { id: 5, src: '/images/product/sample.jpg', title: 'Banner 5' }
-]
-
-const CardProductCarousel = ({ data = defData, title, bgColor, duration = 1000 }) => {
+const CardProductCarousel = ({ data = [], title, bgColor, duration = 1000 }) => {
   const isMobile = useMediaQuery('(max-width:768px)')
   const { lang: locale } = useParams()
+
+  const chunkArray = (arr, size) => {
+    if (!arr || arr.length === 0) return []
+    const chunkedArr = []
+
+    for (let i = 0; i < arr.length; i += size) {
+      chunkedArr.push(arr.slice(i, i + size))
+    }
+
+    return chunkedArr
+  }
+
+  const productsPerSlide = 8
+  const chunkedData = chunkArray(data, productsPerSlide)
 
   return (
     <Box sx={styles.containerBox(bgColor)}>
@@ -133,29 +139,50 @@ const CardProductCarousel = ({ data = defData, title, bgColor, duration = 1000 }
           pagination={{ clickable: true }}
           autoplay={{ delay: duration }}
           loop
-          slidesPerView={4}
+          slidesPerView={1}
           spaceBetween={isMobile ? 5 : 10}
           breakpoints={{
             0: {
-              slidesPerView: 2
+              slidesPerView: 1
             },
             768: {
-              slidesPerView: 4
+              slidesPerView: 1
             }
           }}
         >
-          {data.map((img, i) => (
-            <SwiperSlide key={i}>
-              <Link href={`/${locale}/product/123`}>
-                <Box component='img' src={img.src} alt={`Banner ${img.src}`} sx={styles.bannerImage} />
-                <Typography sx={styles.titleProduct}>{img.title}</Typography>
-                <Typography sx={styles.descProduct}>{img.title}</Typography>
-              </Link>
-              <Link href={`/${locale}/product/123`}>
-                <Box component='img' src={img.src} alt={`Banner ${img.src}`} sx={styles.bannerImage} />
-                <Typography sx={styles.titleProduct}>{img.title}</Typography>
-                <Typography sx={styles.descProduct}>{img.title}</Typography>
-              </Link>
+          {chunkedData.map((productChunk, chunkIndex) => (
+            <SwiperSlide key={chunkIndex}>
+              {/* KUNCI PERBAIKAN: Gunakan GRID MUI di dalam slide */}
+              <Grid container spacing={isMobile ? 1 : 2}>
+                {productChunk.map((product, productIndex) => (
+                  <Grid item xs={6} sm={3} key={productIndex}>
+                    <Link
+                      href={`/${locale}/product/${product.id || '123'}`}
+                      sx={{
+                        textDecoration: 'none',
+                        color: 'inherit',
+                        display: 'block',
+
+                        height: '100%'
+                      }}
+                    >
+                      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                        {/* Gambar Produk */}
+                        <Box
+                          component='img'
+                          src={product.src}
+                          alt={`Banner ${product.title}`}
+                          sx={styles.bannerImage}
+                        />
+
+                        {/* Detail Produk */}
+                        <Typography sx={styles.titleProduct}>{product.title}</Typography>
+                        <Typography sx={styles.descProduct}>{product.category}</Typography>
+                      </Box>
+                    </Link>
+                  </Grid>
+                ))}
+              </Grid>
             </SwiperSlide>
           ))}
         </Swiper>

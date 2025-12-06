@@ -76,11 +76,11 @@ const productFeatures = [
 const styles = {
   gridContainer: {
     margin: '56px 0',
-    width: '100%'
+    paddingRight: { xs: '2rem', sm: '1.75rem' }
   },
   boxImg: {
-    height: { xs: '327px', sm: '460px' },
-    width: { xs: '327px', sm: '460px' },
+    height: { xs: '100%', sm: '460px' },
+    width: { xs: '100%', sm: '460px' },
     objectFit: 'cover',
     borderRadius: '6px'
   },
@@ -173,7 +173,7 @@ const ProductDetailSection = () => {
           <Box sx={styles.boxImg} component={'img'} src='/images/product/sample-2.jpg' />
         </Grid>
         <Grid item sm={7} xs={12}>
-          <Grid container spacing={2}>
+          <Grid container spacing={4}>
             <Grid item sm={6} xs={12}>
               <Typography sx={styles.title}>{dataDetail?.title || 'Carbon'}</Typography>
               <Typography sx={styles.subTitle}>{dataDetail?.subTitle || 'Graniti'}</Typography>
