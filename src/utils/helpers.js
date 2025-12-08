@@ -18,5 +18,17 @@ export const formatDateToCustomStringNative = isoString => {
 
   const cleanTimePart = timePart.replace(/\./g, ':')
 
-  return `${datePart} : ${cleanTimePart}`
+  return `${datePart} | ${cleanTimePart}`
+}
+
+export const slugify = text => {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\-]+/g, '')
+    .replace(/\-\-+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '')
 }

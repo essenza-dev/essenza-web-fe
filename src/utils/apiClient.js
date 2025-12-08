@@ -1,5 +1,12 @@
 import axios from 'axios'
 
+const handleUnauthorized = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('token')
+    window.location.href = '/esse-panel/login'
+  }
+}
+
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
   headers: { 'Content-Type': 'application/json' }
@@ -22,16 +29,30 @@ apiClient.interceptors.response.use(
       status: response.status,
       data: response.data.data,
       meta: response.data.meta,
-      message: response.data.message || 'Berhasil'
+      message: response.data.message || 'Success'
     }
   },
+
   error => {
     const errRes = error.response || {}
+    const status = errRes.status
+
+    if (status === 401 || status === 403) {
+      console.warn(`Unauthorized/Forbidden response received (Status: ${status}). Logging out...`)
+
+      handleUnauthorized()
+
+      return Promise.resolve({
+        success: false,
+        status: status,
+        message: 'Access denied. Session expired or invalid permission.'
+      })
+    }
 
     return Promise.resolve({
       success: false,
-      status: errRes.status || 500,
-      message: errRes.data?.message || error.message || 'Terjadi kesalahan, silakan coba lagi'
+      status: status || 500,
+      message: errRes.data?.message || error.message || 'An error occurred, please try again.'
     })
   }
 )

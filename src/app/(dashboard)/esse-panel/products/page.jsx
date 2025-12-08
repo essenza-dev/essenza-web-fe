@@ -30,6 +30,9 @@ import ActionMenu from '@/@core/components/option-menu/ActionMenu'
 import TableGeneric from '@/@core/components/table/Generic'
 import CustomInputsDebounced from '@/@core/components/custom-inputs/Debounced'
 
+import DialogBasic from '@/components/DialogBasic'
+import BackdropLoading from '@/components/BackdropLoading'
+
 // Fuzzy filter untuk search
 const fuzzyFilter = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)

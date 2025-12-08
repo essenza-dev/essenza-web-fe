@@ -24,7 +24,7 @@ import {
   getSortedRowModel
 } from '@tanstack/react-table'
 
-import { getBanners, x } from '@/services/banner'
+import { getBanners, deleteBanner } from '@/services/banner'
 
 import useSnackbar from '@/@core/hooks/useSnackbar'
 

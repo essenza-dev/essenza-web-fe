@@ -44,10 +44,9 @@ const ProjectsPage = () => {
   const [globalFilter, setGlobalFilter] = useState('')
   const [deleteId, setDeleteId] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [isDataLoading, setIsDataLoading] = useState(true)
 
   const fetchProjects = useCallback(async () => {
-    setIsDataLoading(true)
+    setLoading(true)
 
     try {
       const res = await getProjects(pagination)
@@ -59,7 +58,7 @@ const ProjectsPage = () => {
       error('Gagal memuat data proyek.')
       console.error(err)
     } finally {
-      setIsDataLoading(false)
+      setLoading(false)
     }
   }, [error])
 

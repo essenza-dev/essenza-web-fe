@@ -230,7 +230,7 @@ const ArticleForm = ({ id }) => {
       onSuccess: () =>
         setTimeout(() => {
           router.push('/esse-panel/articles')
-        }, 2000),
+        }, 1000),
       onError: () => {
         setLoading(false)
       }
@@ -278,7 +278,7 @@ const ArticleForm = ({ id }) => {
               <CardContent className='p-0'>
                 <EditorToolbar editor={editor} />
                 <Divider className='my-2' />
-                <EditorContent editor={editor} className='min-h-[250px] p-3 border rounded' />
+                <EditorContent editor={editor} className='min-h-[50vh]' />
               </CardContent>
             </Card>
           </CardContent>

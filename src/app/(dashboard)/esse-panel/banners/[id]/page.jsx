@@ -40,7 +40,6 @@ const BannerDetailPage = () => {
     if (id) fetchBanner()
   }, [id])
 
-  if (loading) return <p className='p-6'>Loading...</p>
   if (!banner) return <p className='p-6'>Banner not found.</p>
 
   return (
