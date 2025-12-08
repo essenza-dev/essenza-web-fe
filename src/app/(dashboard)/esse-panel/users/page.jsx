@@ -19,11 +19,12 @@ import {
 import useSnackbar from '@/@core/hooks/useSnackbar'
 import ActionMenu from '@/@core/components/option-menu/ActionMenu'
 import TableGeneric from '@/@core/components/table/Generic'
-import { deleteProject, getProjects } from '@/services/projects'
+import { deleteUser, getUsers } from '@/services/users'
 import TableHeaderActions from '@/@core/components/table/HeaderActions'
 import { getTruncateText } from '@/utils/string'
 import DialogBasic from '@/components/DialogBasic'
 import BackdropLoading from '@/components/BackdropLoading'
+import { formatDateToCustomStringNative } from '@/utils/helpers'
 
 const fuzzyFilter = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
@@ -35,7 +36,7 @@ const fuzzyFilter = (row, columnId, value, addMeta) => {
 
 const columnHelper = createColumnHelper()
 
-const ProjectsPage = () => {
+const UsersPage = () => {
   const router = useRouter()
   const { success, error, SnackbarComponent } = useSnackbar()
 
@@ -45,17 +46,17 @@ const ProjectsPage = () => {
   const [deleteId, setDeleteId] = useState(null)
   const [loading, setLoading] = useState(false)
 
-  const fetchProjects = useCallback(async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true)
 
     try {
-      const res = await getProjects(pagination)
+      const res = await getUsers(pagination)
 
       if (res?.data) {
         setData(res.data)
       }
     } catch (err) {
-      error('Gagal memuat data proyek.')
+      error('Failed to load data.')
       console.error(err)
     } finally {
       setLoading(false)
@@ -63,8 +64,8 @@ const ProjectsPage = () => {
   }, [error])
 
   useEffect(() => {
-    fetchProjects()
-  }, [fetchProjects])
+    fetchUsers()
+  }, [fetchUsers])
 
   const handleConfirmDelete = useCallback(async () => {
     if (!deleteId) return
@@ -72,23 +73,23 @@ const ProjectsPage = () => {
     setLoading(true)
 
     try {
-      const res = await deleteProject(deleteId)
+      const res = await deleteUser(deleteId)
 
       if (res?.success) {
-        success('Proyek berhasil dihapus!')
+        success('User successfully deleted!')
 
-        fetchProjects()
+        fetchUsers()
       } else {
-        error(res?.message || 'Gagal menghapus proyek!')
+        error(res?.message || 'Failed to delete user!')
       }
     } catch (err) {
-      error(err.message || 'Terjadi kesalahan saat menghapus.')
+      error(err.message || 'An error occurred during deletion.')
       console.error(err)
     } finally {
       setLoading(false)
       setDeleteId(null)
     }
-  }, [deleteId, fetchProjects, success, error])
+  }, [deleteId, fetchUsers, success, error])
 
   const actionsData = useCallback(
     row => [
@@ -97,7 +98,7 @@ const ProjectsPage = () => {
         icon: <i className='ri-eye-line text-blue-500' />,
         menuItemProps: {
           className: 'gap-2',
-          onClick: () => router.push(`/esse-panel/projects/${row.original.id}`)
+          onClick: () => router.push(`/esse-panel/users/${row.original.id}`)
         }
       },
       {
@@ -105,7 +106,7 @@ const ProjectsPage = () => {
         icon: <i className='ri-edit-box-line text-yellow-500' />,
         menuItemProps: {
           className: 'gap-2',
-          onClick: () => router.push(`/esse-panel/projects/${row.original.id}/edit`)
+          onClick: () => router.push(`/esse-panel/users/${row.original.id}/edit`)
         }
       },
       {
@@ -123,58 +124,55 @@ const ProjectsPage = () => {
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor('image', {
-        header: 'Image',
+      columnHelper.accessor('name', {
+        header: 'Name',
         cell: info => (
-          <Box sx={{ display: 'flex' }}>
-            <Box
-              component='img'
-              src={info.getValue()}
-              alt='Project'
-              onError={e => {
-                e.target.src = '/images/broken-image.png'
-              }}
-              sx={{ width: 96, height: 48, objectFit: 'cover', borderRadius: 1 }}
-            />
+          <Box>
+            <Typography variant='body2' fontWeight={600}>
+              {info.getValue()}
+            </Typography>
           </Box>
-        ),
-        enableSorting: false
-      }),
-      columnHelper.accessor('title', {
-        header: 'Title',
-        cell: info => (
-          <Typography variant='body2' fontWeight={600}>
-            {info.getValue()}
-          </Typography>
         )
       }),
-      columnHelper.accessor('description', {
-        header: 'Description',
+      columnHelper.accessor('username', {
+        header: 'Username',
+        cell: info => (
+          <Box>
+            <Typography variant='body2' fontWeight={600}>
+              {info.getValue()}
+            </Typography>
+          </Box>
+        )
+      }),
+      columnHelper.accessor('email', {
+        header: 'Email',
+        cell: info => {
+          return (
+            <Typography variant='body2' fontWeight={600}>
+              {info.getValue()}
+            </Typography>
+          )
+        }
+      }),
+      columnHelper.accessor('role', {
+        header: 'Role',
         cell: info => {
           const fullText = info.getValue()
 
           return (
-            <Tooltip title={fullText} arrow>
-              <Box sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                <Typography variant='body2' sx={{ fontSize: '0.875rem' }}>
-                  {getTruncateText(fullText, 30)}
-                </Typography>
-              </Box>
-            </Tooltip>
+            <Typography variant='body2' fontWeight={600}>
+              {info.getValue()?.label || '-'}
+            </Typography>
           )
         }
       }),
-      columnHelper.accessor('location', {
-        header: 'Location',
-        cell: info => <Typography variant='body2'>{info.getValue()}</Typography>
+      columnHelper.accessor('created_at', {
+        header: 'Created At',
+        cell: info => <Typography variant='body2'>{formatDateToCustomStringNative(info.getValue())}</Typography>
       }),
-      columnHelper.accessor('slug', {
-        header: 'Slug',
-        cell: info => (
-          <Typography color='text.secondary' variant='caption'>
-            {info.getValue()}
-          </Typography>
-        )
+      columnHelper.accessor('updated_at', {
+        header: 'Upadated At',
+        cell: info => <Typography variant='body2'>{formatDateToCustomStringNative(info.getValue())}</Typography>
       }),
       columnHelper.accessor('is_active', {
         header: 'Status',
@@ -220,14 +218,14 @@ const ProjectsPage = () => {
   return (
     <>
       <Card sx={{ boxShadow: 3 }}>
-        <CardHeader title='Project Management' sx={{ p: 4 }} />
+        <CardHeader title='User Management' sx={{ p: 4 }} />
         <Divider />
         <TableHeaderActions
-          searchPlaceholder='Search Project'
+          searchPlaceholder='Search User'
           searchValue={globalFilter ?? ''}
           onSearchChange={setGlobalFilter}
-          addLabel='Add Project'
-          addHref='/esse-panel/projects/add'
+          addLabel='Add User'
+          addHref='/esse-panel/users/add'
           addColor='success'
         />
         <TableGeneric table={table} />
@@ -258,8 +256,8 @@ const ProjectsPage = () => {
         open={deleteId !== null}
         onClose={() => setDeleteId(null)}
         onSubmit={handleConfirmDelete}
-        title='Delete Project'
-        description='Apakah Anda yakin ingin menghapus proyek ini?'
+        title='Delete User'
+        description='Apakah Anda yakin ingin menghapus User ini?'
       />
       {SnackbarComponent}
       <BackdropLoading open={loading} />
@@ -267,4 +265,4 @@ const ProjectsPage = () => {
   )
 }
 
-export default ProjectsPage
+export default UsersPage

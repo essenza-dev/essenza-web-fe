@@ -81,9 +81,9 @@ const ProjectDetailPage = () => {
               label={'Status'}
               value={
                 project.is_active ? (
-                  <Chip label='Active' size='small' color='success' variant='outlined' sx={{ borderRadius: 1 }} />
+                  <Chip label='Active' size='small' color='success' variant='tonal' sx={{ borderRadius: 1 }} />
                 ) : (
-                  <Chip label='Inactive' size='small' color='error' variant='outlined' sx={{ borderRadius: 1 }} />
+                  <Chip label='Inactive' size='small' color='error' variant='tonal' sx={{ borderRadius: 1 }} />
                 )
               }
             />

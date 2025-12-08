@@ -13,7 +13,11 @@ const CustomTextField = ({
   rows = 1,
   value = '',
   required = false,
-  onChange
+  onChange,
+  InputProps,
+  type = 'text',
+  select = false,
+  children
 }) => {
   return (
     <Grid item xs={12} sm={size} key={name}>
@@ -29,7 +33,12 @@ const CustomTextField = ({
         onChange={onChange}
         placeholder={placeholder}
         required={required}
-      />
+        InputProps={InputProps}
+        type={type}
+        select={select}
+      >
+        {children}
+      </TextField>
     </Grid>
   )
 }
