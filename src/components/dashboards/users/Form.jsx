@@ -57,9 +57,7 @@ const UserForm = ({ id }) => {
 
       try {
         const res = await getUserById(id)
-        const userData = { ...res.data, password: '' }
-
-        console.log('User Data Loaded (Role):', userData.role)
+        const userData = { ...res.data, role: res?.data?.role?.name, password: '' }
 
         setData(userData)
       } catch {
@@ -105,7 +103,7 @@ const UserForm = ({ id }) => {
 
   const handleChange = useCallback(e => {
     const { name, value } = e.target
-
+    console.log('name', name, value)
     setData(prev => ({ ...prev, [name]: value }))
   }, [])
 
@@ -148,11 +146,32 @@ const UserForm = ({ id }) => {
     })
   }
 
+  const fieldPassword = useMemo(() => [
+    {
+      name: 'password',
+      label: 'Password',
+      placeholder: 'Password',
+      size: 6,
+      required: true,
+      type: 'password',
+      show: showPassword
+    },
+    {
+      name: 'rePassword',
+      label: 'Re-enter Password',
+      placeholder: 'Confirm Password',
+      size: 6,
+      required: true,
+      type: 'password',
+      show: showRePassword
+    }
+  ])
+
   const fields = useMemo(() => {
     const commonFields = [
-      { name: 'username', label: 'Username', placeholder: 'Username', size: 6, required: true, disabled: isEdit },
       { name: 'name', label: 'Full Name', placeholder: 'Full Name', size: 6, required: true },
-      { name: 'email', label: 'Email', placeholder: 'user@email.com', size: 6, required: true }
+      { name: 'email', label: 'Email', placeholder: 'user@email.com', size: 6, required: true },
+      { name: 'username', label: 'Username', placeholder: 'Username', size: 6, required: true, disabled: isEdit }
     ]
 
     if (isEdit) {
@@ -174,28 +193,7 @@ const UserForm = ({ id }) => {
         })
         .filter(Boolean)
     } else {
-      return [
-        ...commonFields,
-
-        {
-          name: 'password',
-          label: 'Password',
-          placeholder: 'Password',
-          size: 6,
-          required: true,
-          type: 'password',
-          show: showPassword
-        },
-        {
-          name: 'rePassword',
-          label: 'Re-enter Password',
-          placeholder: 'Confirm Password',
-          size: 6,
-          required: true,
-          type: 'password',
-          show: showRePassword
-        }
-      ]
+      return commonFields
     }
   }, [isEdit])
 
@@ -283,6 +281,13 @@ const UserForm = ({ id }) => {
                   control={<Switch checked={data.is_active} onChange={handleSwitchChange} />}
                   label={data?.is_active ? 'Active' : 'Inactive'}
                 />
+              </Grid>
+              <Grid item sm={12}>
+                <Divider />
+              </Grid>
+              {fieldPassword.map(field => renderField(field))}
+              <Grid item sm={12}>
+                <Divider />
               </Grid>
               <CustomTextField
                 label='Role'

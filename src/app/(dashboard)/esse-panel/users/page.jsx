@@ -127,44 +127,22 @@ const UsersPage = () => {
       columnHelper.accessor('name', {
         header: 'Name',
         cell: info => (
-          <Box>
-            <Typography variant='body2' fontWeight={600}>
-              {info.getValue()}
-            </Typography>
-          </Box>
+          <Typography variant='body2' fontWeight={600}>
+            {info.getValue()}
+          </Typography>
         )
       }),
       columnHelper.accessor('username', {
         header: 'Username',
-        cell: info => (
-          <Box>
-            <Typography variant='body2' fontWeight={600}>
-              {info.getValue()}
-            </Typography>
-          </Box>
-        )
+        cell: info => <Typography variant='body2'>{info.getValue()}</Typography>
       }),
       columnHelper.accessor('email', {
         header: 'Email',
-        cell: info => {
-          return (
-            <Typography variant='body2' fontWeight={600}>
-              {info.getValue()}
-            </Typography>
-          )
-        }
+        cell: info => <Typography variant='body2'>{info.getValue()}</Typography>
       }),
       columnHelper.accessor('role', {
         header: 'Role',
-        cell: info => {
-          const fullText = info.getValue()
-
-          return (
-            <Typography variant='body2' fontWeight={600}>
-              {info.getValue()?.label || '-'}
-            </Typography>
-          )
-        }
+        cell: info => <Typography variant='body2'>{info.getValue()?.label || '-'}</Typography>
       }),
       columnHelper.accessor('created_at', {
         header: 'Created At',

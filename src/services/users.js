@@ -13,19 +13,19 @@ const getUserById = async id => {
 }
 
 const createUser = async data => {
-  return await apiClient.post(`/int/v1/users`, data, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  })
+  return await apiClient.post(`/int/v1/users`, data)
 }
 
 const updateUser = async (id, data) => {
-  return await apiClient.put(`/int/v1/users/${id}`, data, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  })
+  return await apiClient.put(`/int/v1/users/${id}`, data)
+}
+
+const updatePassword = async (id, data) => {
+  return await apiClient.put(`/int/v1/users/${id}/password`, data)
 }
 
 const deleteUser = async id => {
   return await apiClient.delete(`/int/v1/users/${id}`)
 }
 
-export { getUsers, getUserRoles, getUserById, createUser, updateUser, deleteUser }
+export { getUsers, getUserRoles, getUserById, createUser, updateUser, updatePassword, deleteUser }

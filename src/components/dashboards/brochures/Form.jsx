@@ -84,10 +84,8 @@ const BrochuresForm = ({ id }) => {
       const res = await getBrochureById(id)
 
       setData(res.data)
-      console.log('res', res.data)
       if (res.data?.file_url) {
         const fileName = res.data.file_url.split('/').pop() || res.data.file_url
-        console.log(fileName)
         setPreview(fileName)
       }
     } catch {

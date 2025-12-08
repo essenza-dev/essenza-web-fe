@@ -136,8 +136,6 @@ const ArticlePage = () => {
         header: 'Title',
         cell: ({ row }) => {
           const data = row.original
-
-          console.log('data', data)
           const thumbnail = data.thumbnail
           const title = data.title || '-'
           const slug = data.slug || ''

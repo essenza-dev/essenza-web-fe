@@ -141,8 +141,6 @@ const PagesManagement = () => {
   const fetchPage = async () => {
     const res = await getPages(pagination)
 
-    console.log('res', res)
-
     if (res?.data) {
       setData(res.data)
       setFilteredData(res.data)

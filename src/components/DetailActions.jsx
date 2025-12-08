@@ -9,7 +9,7 @@ import Button from '@mui/material/Button'
 
 import DialogBasic from './DialogBasic'
 
-const DetailActions = ({ id, href, onConfirm }) => {
+const DetailActions = ({ id, href, onConfirm, customButton }) => {
   const [openDelete, setOpenDelete] = useState(false)
   const router = useRouter()
 
@@ -44,6 +44,7 @@ const DetailActions = ({ id, href, onConfirm }) => {
         >
           Edit
         </Button>
+        {customButton}
       </Box>
       <DialogBasic
         open={openDelete}

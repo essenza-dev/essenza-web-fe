@@ -70,8 +70,6 @@ const MenuPage = () => {
   }
 
   const handleSubmit = () => {
-    console.log('Menus:', menus)
-    console.log('Menu Items:', menuItems)
     alert('Menus saved successfully!')
   }
 
