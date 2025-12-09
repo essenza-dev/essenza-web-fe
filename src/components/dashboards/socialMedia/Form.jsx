@@ -40,7 +40,7 @@ const ItemForm = ({ item, index, onEdit, onCancel, onSave, onDelete, socialMedia
   const usedPlatforms = socialMedia.map(i => i?.platform).filter(Boolean)
 
   return (
-    <Grid container item spacing={2} alignItems='center'>
+    <Grid container item spacing={3} alignItems='center'>
       <Grid item xs={2}>
         <FormControl fullWidth size='small' disabled={!isEdit}>
           <InputLabel>Platform</InputLabel>
@@ -97,7 +97,6 @@ const ItemForm = ({ item, index, onEdit, onCancel, onSave, onDelete, socialMedia
             <IconButton sx={{ borderRadius: '6px', border: '1px solid orange' }} onClick={() => onCancel(index)}>
               <i className='ri-close-line text-orange-500 text-lg' />
             </IconButton>
-
             <IconButton
               sx={{ borderRadius: '6px', border: '1px solid green' }}
               onClick={() => onSave(index)}
@@ -121,7 +120,6 @@ const SocialMediaForm = () => {
   const [deleteIndex, setDeleteIndex] = useState(null)
   const [editingIndex, setEditingIndex] = useState(null)
   const [backupItem, setBackupItem] = useState(null)
-  
   const [loading, setLoading] = useState(false)
 
   const { success, error, SnackbarComponent } = useSnackbar()
@@ -142,8 +140,11 @@ const SocialMediaForm = () => {
 
   const handleAdd = () => {
     const newItem = { id: null, platform: '', url: '', order_no: '' }
+    const updated = [...socialMedia]
 
-    setSocialMedia(prev => [...prev, newItem])
+    updated[editingIndex] = backupItem
+
+    setSocialMedia([...updated, newItem])
 
     const newIndex = socialMedia.length
 
@@ -183,6 +184,19 @@ const SocialMediaForm = () => {
     setBackupItem(null)
   }
 
+  const onDelete = index => {
+    const item = socialMedia[index]
+
+    if (!item.id) {
+      setSocialMedia(prev => prev.filter((_, i) => i !== index))
+    } else {
+      setDeleteIndex(index)
+    }
+
+    setBackupItem(null)
+    setEditingIndex(null)
+  }
+
   const onSave = async index => {
     const item = socialMedia[index]
 
@@ -204,18 +218,6 @@ const SocialMediaForm = () => {
     }
 
     setLoading(false)
-  }
-
-  const onDelete = index => {
-    const item = socialMedia[index]
-
-    if (!item.id) {
-      setSocialMedia(prev => prev.filter((_, i) => i !== index))
-
-      return
-    }
-
-    setDeleteIndex(index)
   }
 
   const confirmDelete = async () => {
@@ -240,8 +242,9 @@ const SocialMediaForm = () => {
     <>
       <Card>
         <CardHeader title='Social Media Settings' />
+        <Divider />
         <CardContent>
-          <Grid container spacing={3} className='mb-5'>
+          <Grid container spacing={5}>
             {socialMedia.map((item, index) => (
               <ItemForm
                 key={index}
@@ -257,23 +260,20 @@ const SocialMediaForm = () => {
               />
             ))}
           </Grid>
-
-          <Box className='mb-5'>
-            <Button
-              startIcon={<i className='ri-add-line' />}
-              variant='contained'
-              color='success'
-              size='small'
-              onClick={handleAdd}
-            >
-              Add Social Media
-            </Button>
-          </Box>
-
-          <Divider />
         </CardContent>
+        <Divider />
+        <Box className='p-4'>
+          <Button
+            startIcon={<i className='ri-add-line' />}
+            variant='contained'
+            color='success'
+            size='small'
+            onClick={handleAdd}
+          >
+            Add Social Media
+          </Button>
+        </Box>
       </Card>
-
       <DialogBasic
         open={deleteIndex !== null}
         onClose={() => setDeleteIndex(null)}
@@ -281,7 +281,6 @@ const SocialMediaForm = () => {
         title='Delete Social Media'
         description='Are you sure to delete this social media?'
       />
-
       {SnackbarComponent}
       <BackdropLoading open={loading} />
     </>

@@ -9,14 +9,8 @@ const verticalMenuData = () => [
     icon: 'ri-settings-3-line',
     children: [
       { label: 'General Settings', href: '/esse-panel/settings' },
-      { label: 'Social Media', href: '/esse-panel/social-media' },
-      {
-        label: 'Menus',
-        children: [
-          { label: 'Menus', href: '/esse-panel/menus' },
-          { label: 'Menu Items', href: '/esse-panel/menu-items' }
-        ]
-      }
+      { label: 'Menus', href: '/esse-panel/menus' },
+      { label: 'Social Media', href: '/esse-panel/social-media' }
     ]
   },
   {
