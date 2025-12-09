@@ -21,7 +21,7 @@ const deleteMenu = async id => {
 }
 
 const createMenuItem = async data => {
-  return await apiClient.post('/int/v1/menus', data)
+  return await apiClient.post('/int/v1/menu-items', data)
 }
 
 const getMenusItem = async (params = {}) => {
@@ -29,15 +29,15 @@ const getMenusItem = async (params = {}) => {
 }
 
 const getMenuByIdItem = async id => {
-  return await apiClient.get(`/int/v1/menus/${id}`)
+  return await apiClient.get(`/int/v1/menu-items/${id}`)
 }
 
 const updateMenuItem = async (id, data) => {
-  return await apiClient.patch(`/int/v1/menus/${id}`, data)
+  return await apiClient.patch(`/int/v1/menu-items/${id}`, data)
 }
 
 const deleteMenuItem = async id => {
-  return await apiClient.delete(`/int/v1/menus/${id}`)
+  return await apiClient.delete(`/int/v1/menu-items/${id}`)
 }
 
 const getMenuItemsByMenuId = async menuId => {
