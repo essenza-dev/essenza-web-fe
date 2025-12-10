@@ -38,6 +38,7 @@ const UserDetailPage = () => {
   const [loading, setLoading] = useState(true)
 
   const passwordsMatch = data.password === data.rePassword
+
   const passwordsValid = useMemo(() => {
     return data.password.length > 0 && data.rePassword.length > 0 && passwordsMatch
   }, [data.password, data.rePassword, passwordsMatch])
@@ -88,6 +89,7 @@ const UserDetailPage = () => {
   const handleChangePassword = useCallback(async () => {
     if (!passwordsValid) {
       error(passwordsMatch ? 'Password cannot be empty.' : 'Passwords do not match.')
+
       return
     }
 
@@ -115,6 +117,7 @@ const UserDetailPage = () => {
 
   const handlePasswordChange = useCallback(e => {
     const { name, value } = e.target
+
     setData(prev => ({ ...prev, [name]: value }))
   }, [])
 

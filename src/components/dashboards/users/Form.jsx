@@ -103,7 +103,7 @@ const UserForm = ({ id }) => {
 
   const handleChange = useCallback(e => {
     const { name, value } = e.target
-    console.log('name', name, value)
+
     setData(prev => ({ ...prev, [name]: value }))
   }, [])
 

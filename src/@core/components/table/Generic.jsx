@@ -3,7 +3,8 @@ import { flexRender } from '@tanstack/react-table'
 import tableStyles from '@core/styles/table.module.css'
 
 const TableGeneric = ({ table, columns }) => {
-  const totalColumns = table.getVisibleFlatColumns().length;
+  const totalColumns = table.getVisibleFlatColumns().length
+
   return (
     <div className='overflow-x-auto'>
       <table className={tableStyles.table}>
