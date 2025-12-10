@@ -2,7 +2,6 @@
 
 import { useMediaQuery } from '@mui/material'
 
-import EndSection from '@/components/section/EndSection'
 import HeaderPageSection from '@/components/section/HeaderPageSection'
 import ProductDetailSection from '@/components/section/ProductDetailSection'
 

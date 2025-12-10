@@ -34,7 +34,7 @@ const SearchBar = props => {
             borderRadius: '10px'
           }}
         >
-          <form onSubmit={handleSubmit} class='w-full flex items-center gap-2'>
+          <form onSubmit={handleSubmit} className='w-full flex items-center gap-2'>
             <TextField
               size='small'
               fullWidth

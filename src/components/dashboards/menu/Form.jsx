@@ -12,11 +12,11 @@ import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
+
 import BackdropLoading from '@/components/BackdropLoading'
 import useSnackbar from '@/@core/hooks/useSnackbar'
 import { createMenuItem, deleteMenuItem, getMenus, updateMenuItem } from '@/services/menu'
-
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
 import CustomTextField from '@/@core/components/custom-inputs/TextField'
 import DialogBasic from '@/components/DialogBasic'
@@ -25,6 +25,7 @@ import { handleApiResponse } from '@/utils/handleApiResponse'
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list)
   const [removed] = result.splice(startIndex, 1)
+
   result.splice(endIndex, 0, removed)
 
   return result.map((item, index) => ({
@@ -136,13 +137,16 @@ const MenuForm = () => {
 
   const fetchMenu = useCallback(async () => {
     setLoading(true)
+
     try {
       const res = await getMenus()
+
       if (res?.data?.length > 0) {
         const sortedMenu = res.data.map(menuItem => ({
           ...menuItem,
           items: menuItem.items.sort((a, b) => (a.order_no || 0) - (b.order_no || 0))
         }))
+
         setMenu(sortedMenu)
       } else {
         setMenu([])
@@ -160,6 +164,7 @@ const MenuForm = () => {
     const { menuIndex, itemIndex, item } = deleteIndex
 
     setLoading(true)
+
     try {
       handleApiResponse(() => deleteMenuItem(item?.id), {
         success: msg => success(msg || 'Successfully deleted!'),
@@ -238,6 +243,7 @@ const MenuForm = () => {
 
       if (!itemToSave.label || !itemToSave.link) {
         error('Label and URL are required.')
+
         return
       }
 
@@ -245,6 +251,7 @@ const MenuForm = () => {
 
       if (itemToSave.isNew) {
         const currentItems = menu[menuIndex].items
+
         calculatedOrderNo = currentItems.length
       }
 
@@ -307,6 +314,7 @@ const MenuForm = () => {
     menuIndex => {
       if (editingIndex !== null) {
         error('Please finish editing the current item first.')
+
         return
       }
 
@@ -314,6 +322,7 @@ const MenuForm = () => {
 
       const currentItems = menu[menuIndex].items
       const maxOrderNo = currentItems.reduce((max, item) => Math.max(max, item.order_no || 0), 0)
+
       const newItem = {
         label: '',
         link: '',
@@ -322,9 +331,11 @@ const MenuForm = () => {
       }
 
       let updatedMenu = [...menu]
+
       updatedMenu[menuIndex] = { ...updatedMenu[menuIndex] }
       updatedMenu[menuIndex].items = [...updatedMenu[menuIndex].items]
       const newItemIndex = updatedMenu[menuIndex].items.length
+
       updatedMenu[menuIndex].items.push(newItem)
 
       setMenu(updatedMenu)
@@ -354,6 +365,7 @@ const MenuForm = () => {
       const reorderedItems = reorder(menuItems, sourceIndex, destinationIndex)
 
       let updatedMenu = [...menu]
+
       updatedMenu[menuIndex] = { ...updatedMenu[menuIndex], items: reorderedItems }
 
       setMenu(updatedMenu)
@@ -365,14 +377,18 @@ const MenuForm = () => {
   const handleUpdateOrder = useCallback(async () => {
     if (editingIndex !== null) {
       error('Please finish editing the current item before updating the order.')
+
       return
     }
+
     if (!orderChanged) {
       info('No order changes to save.')
+
       return
     }
 
     const orderUpdates = []
+
     menu.forEach(menuItem => {
       menuItem.items.forEach(item => {
         if (!item.isNew && item.id) {
@@ -387,12 +403,15 @@ const MenuForm = () => {
     if (orderUpdates.length === 0) {
       info('No existing menu items found to update order.')
       setOrderChanged(false)
+
       return
     }
 
     setLoading(true)
+
     const updatePromises = orderUpdates.map(update => {
       const data = { order_no: update.order_no }
+
       return updateMenuItem(update.id, data)
     })
 
@@ -495,6 +514,7 @@ const MenuForm = () => {
             color='success'
             size='small'
             onClick={handleUpdateOrder}
+
             // disabled={true}
           >
             Update Order (Auto Save)

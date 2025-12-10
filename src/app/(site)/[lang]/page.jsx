@@ -6,8 +6,6 @@ import NewsSection from '@/components/section/NewsSection'
 import ProjectSection from '@/components/section/ProjectSection'
 
 const HomePage = () => {
-  // Hooks
-
   return (
     <>
       <BannerSection />
