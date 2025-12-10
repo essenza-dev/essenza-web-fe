@@ -8,6 +8,10 @@ import Grid from '@mui/material/Grid'
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
+import Button from '@mui/material/Button'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import Fade from '@mui/material/Fade'
 
 import CustomButton from '@/@core/components/mui/Button'
 
@@ -66,6 +70,124 @@ const companyData = [
   }
 ]
 
+const storeData = [
+  {
+    city: 'Jakarta',
+    companies: [
+      {
+        id: 'JKT-001',
+        name: 'PT DIMENSI PROCIPTA INDONESIA (DP HAUS)',
+        address: 'Panglima Polim Raya 107B Jakarta Selatan',
+        phone: '(021) 7399606'
+      },
+      {
+        id: 'JKT-002',
+        name: 'PT. GADING MAS MULTI PRIMA',
+        address: 'Jl. Taman Griya Pratama Blok 7 No. 41 Pegangsaan Dua Kelapa Gading Jakarta Utara',
+        phone: '(021) 22468888'
+      },
+      {
+        id: 'JKT-003',
+        name: 'Alam Jaya',
+        address: 'Daan Mogot KM 12.5 No. 43 Jakarta Barat',
+        phone: '021 544 3467'
+      }
+    ]
+  },
+  {
+    city: 'Bandung',
+    companies: [
+      {
+        id: 'BDG-001',
+        name: 'PT ALAS MULIA',
+        address: 'Jl. Otto Iskandar Dinata No. 357 Bandung',
+        phone: '(022) 4208111'
+      },
+      {
+        id: 'BDG-002',
+        name: 'CV. Makmur Sentosa',
+        address: 'Jl. Asia Afrika No. 100 Bandung',
+        phone: '(022) 7701234'
+      },
+      {
+        id: 'BDG-003',
+        name: 'Toko Granit Utama',
+        address: 'Jl. Cihampelas No. 50 Bandung',
+        phone: '(022) 5432109'
+      }
+    ]
+  },
+  {
+    city: 'Surabaya',
+    companies: [
+      {
+        id: 'SBY-001',
+        name: 'PT BERKAT PUTRA BUANA',
+        address: 'Jalan Baliwerti 55 Surabaya',
+        phone: '(031) 5350519'
+      },
+      {
+        id: 'SBY-002',
+        name: 'Global Keramik SBY',
+        address: 'Jl. Raya Darmo No. 45 Surabaya',
+        phone: '(031) 8877665'
+      },
+      {
+        id: 'SBY-003',
+        name: 'Indah Marmer',
+        address: 'Jl. Kertajaya Indah No. 10 Surabaya',
+        phone: '(031) 5678901'
+      }
+    ]
+  },
+  {
+    city: 'Semarang',
+    companies: [
+      {
+        id: 'SMG-001',
+        name: 'PT GRAHA PELANGI JAYA',
+        address: 'Perkantoran THD Blok A No. 25 Semarang',
+        phone: '(024) -3553001'
+      },
+      {
+        id: 'SMG-002',
+        name: 'Central Bangunan',
+        address: 'Jl. Pemuda No. 10 Semarang',
+        phone: '(024) 4455667'
+      },
+      {
+        id: 'SMG-003',
+        name: 'Toko Jaya Abadi',
+        address: 'Jl. Gajah Mada No. 20 Semarang',
+        phone: '(024) 1122334'
+      }
+    ]
+  },
+  {
+    city: 'Tangerang',
+    companies: [
+      {
+        id: 'TNG-001',
+        name: 'Bintang Keramik',
+        address: 'Jl. Boulevard Raya Blok A No. 1 BSD City Tangerang',
+        phone: '021 199 507'
+      },
+      {
+        id: 'TNG-002',
+        name: 'Mitra Mandiri Granit',
+        address: 'Ruko Golden Road No. 5 Gading Serpong Tangerang',
+        phone: '(021) 9876543'
+      },
+      {
+        id: 'TNG-003',
+        name: 'Depo Material',
+        address: 'Jl. Raya Serpong KM 8 Tangerang',
+        phone: '(021) 1234567'
+      }
+    ]
+  }
+]
+
 const styles = {
   container: {
     padding: '36px 0'
@@ -96,6 +218,9 @@ const ButtonInfo = ({ text, isActive, onClick }) => {
 }
 
 const BoxItem = ({ data }) => {
+  const displayLocation = data?.address || data?.location
+  const displayPhone = data?.phone
+
   return (
     <Box sx={{ borderRadius: '10px', backgroundColor: '#FFFFFF' }}>
       <Box sx={{ padding: '12px 24px' }}>
@@ -114,7 +239,7 @@ const BoxItem = ({ data }) => {
             }}
           >
             <Box component={'img'} src='/icons/distance.svg' />
-            <Typography>{data?.location}</Typography>
+            <Typography>{displayLocation}</Typography>
           </Box>
           <Box
             sx={{
@@ -125,15 +250,15 @@ const BoxItem = ({ data }) => {
             }}
           >
             <Box component={'img'} src='/icons/call.svg' />
-            <Typography>{data?.phone}</Typography>
+            <Typography>{displayPhone}</Typography>
           </Box>
         </Grid>
         <Grid item sm={5} xs={12}>
           <Grid container spacing={3}>
-            <Grid item sm={6}>
+            <Grid item sm={6} xs={6}>
               <CustomButton>View Location</CustomButton>
             </Grid>
-            <Grid item sm={6}>
+            <Grid item sm={6} xs={6}>
               <CustomButton>Contact Us</CustomButton>
             </Grid>
           </Grid>
@@ -147,6 +272,24 @@ const InfoSection = () => {
   const isMobile = useMediaQuery('(max-width:768px)')
 
   const [selectedInfo, setSelectedInfo] = useState('distributor')
+  const [selectedLocation, setSelectedLocation] = useState('')
+  const [showLocation, setShowLocation] = useState(null)
+  const open = Boolean(showLocation)
+
+  const filteredStores = storeData.find(data => data.city === selectedLocation)?.companies || []
+
+  const handleClick = event => {
+    setShowLocation(event.currentTarget)
+  }
+
+  const handleClose = () => {
+    setShowLocation(null)
+  }
+
+  const handleInfoChange = info => {
+    setSelectedInfo(info)
+    setSelectedLocation('')
+  }
 
   return (
     <Container maxWidth='lg' sx={styles.container} className={frontCommonStyles.layoutSpacing}>
@@ -155,23 +298,101 @@ const InfoSection = () => {
           <ButtonInfo
             text={'Our Distributors'}
             isActive={selectedInfo === 'distributor'}
-            onClick={() => setSelectedInfo('distributor')}
+            onClick={() => handleInfoChange('distributor')}
           />
         </Grid>
         <Grid item sm={6} xs={12}>
           <ButtonInfo
             text={'Our Stores'}
             isActive={selectedInfo === 'store'}
-            onClick={() => setSelectedInfo('store')}
+            onClick={() => handleInfoChange('store')}
           />
         </Grid>
       </Grid>
       <Grid container spacing={3} mt={3}>
-        {companyData.map(data => (
-          <Grid item sm={12} key={data?.id}>
-            <BoxItem data={data} />
-          </Grid>
-        ))}
+        {selectedInfo === 'distributor' && (
+          <>
+            {companyData.map(data => (
+              <Grid item sm={12} key={data?.id}>
+                <BoxItem data={data} />
+              </Grid>
+            ))}
+          </>
+        )}
+        {selectedInfo === 'store' && (
+          <>
+            <Grid item xs={12}>
+              <Button
+                aria-controls={open ? 'location-menu' : undefined}
+                aria-haspopup='true'
+                aria-expanded={open ? 'true' : undefined}
+                variant='contained'
+                disableElevation
+                sx={{
+                  width: '100% !important',
+                  backgroundColor: '#FFFFFF',
+                  color: '#212121',
+                  border: '1.5px solid #E0E0E0',
+                  borderRadius: '7.5px',
+                  boxShadow: 'unset',
+                  '&:hover': { backgroundColor: '#f5f5f5', color: '#212121' }
+                }}
+                onClick={handleClick}
+                endIcon={
+                  showLocation ? (
+                    <i className='ri-arrow-up-s-line text-xs' />
+                  ) : (
+                    <i className='ri-arrow-down-s-line text-xs' />
+                  )
+                }
+              >
+                {selectedLocation || 'Select Location'}
+              </Button>
+              <Menu
+                id='location-menu'
+                slotProps={{
+                  list: {
+                    'aria-labelledby': 'demo-customized-button'
+                  }
+                }}
+                anchorEl={showLocation}
+                open={open}
+                onClose={handleClose}
+                sx={{
+                  '& .MuiPaper-root': { width: showLocation ? showLocation.offsetWidth : 200, marginTop: 1 },
+                  '& .MuiList-root ': { padding: 0 }
+                }}
+              >
+                {storeData.map(data => (
+                  <MenuItem
+                    onClick={() => {
+                      setSelectedLocation(data?.city)
+                      handleClose()
+                    }}
+                    disableRipple
+                    key={data?.city}
+                    sx={{ justifyContent: 'center' }}
+                  >
+                    {data?.city}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Grid>
+            {selectedLocation && (
+              <Grid item xs={12}>
+                <Fade in={filteredStores.length > 0} timeout={1000} sx={{ height: 'auto' }}>
+                  <Grid container spacing={3}>
+                    {filteredStores.map(data => (
+                      <Grid item xs={12} key={data?.id}>
+                        <BoxItem data={data} />
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Fade>
+              </Grid>
+            )}
+          </>
+        )}
       </Grid>
     </Container>
   )
