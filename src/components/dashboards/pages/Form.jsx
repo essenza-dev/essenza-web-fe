@@ -25,7 +25,6 @@ import { TextAlign } from '@tiptap/extension-text-align'
 import { getPageById, updatePage, createPage } from '@/services/pages'
 
 import useSnackbar from '@/@core/hooks/useSnackbar'
-
 import EditorToolbar from '@/@core/components/editor/EditorToolbar'
 
 import '@/libs/styles/tiptapEditor.css'
@@ -79,7 +78,7 @@ const PageForm = ({ id }) => {
         setData(res.data)
 
         if (editor && res.data?.content) {
-          editor.commands.setContent(res.data?.content, false)
+          editor.commands.setContent(res?.data?.content, false)
         }
       } catch {
         error('Failed to load project details.')

@@ -26,13 +26,13 @@ import { getArticleById, createArticle, updateArticle } from '@/services/article
 import CustomTextField from '@/@core/components/custom-inputs/TextField'
 
 import useSnackbar from '@/@core/hooks/useSnackbar'
-
 import EditorToolbar from '@/@core/components/editor/EditorToolbar'
 
 import '@/libs/styles/tiptapEditor.css'
 import FormActions from '@/components/FormActions'
 import BackdropLoading from '@/components/BackdropLoading'
 import { handleApiResponse } from '@/utils/handleApiResponse'
+import { slugify } from '@/utils/helpers'
 
 const defaultData = {
   title: '',
@@ -96,6 +96,7 @@ const ImageUploader = ({ preview, onFileChange, onRemove }) => (
 const ArticleForm = ({ id }) => {
   const router = useRouter()
   const isEdit = !!id
+
   const [data, setData] = useState(defaultData)
   const [loading, setLoading] = useState(false)
   const [preview, setPreview] = useState('')
@@ -183,10 +184,6 @@ const ArticleForm = ({ id }) => {
         if (res.data?.thumbnail) {
           setPreview(res.data.thumbnail)
         }
-
-        if (editor && res.data?.content) {
-          editor.commands.setContent(res.data.content, false)
-        }
       } catch {
         error('Failed to load project details.')
       } finally {
@@ -238,9 +235,35 @@ const ArticleForm = ({ id }) => {
   }
 
   useEffect(() => {
+    if (isEdit && editor && data?.content) {
+      const currentEditorContent = editor.getHTML()
+
+      if (data.content !== currentEditorContent && data.content !== defaultData.content) {
+        editor.commands.setContent(data.content, false)
+      }
+    }
+  }, [editor, data.content, isEdit])
+
+  useEffect(() => {
     setPreview('')
     if (id) fetchArticle(id)
   }, [id, fetchArticle])
+
+  useEffect(() => {
+    if (data?.title) {
+      const newSlug = slugify(data?.title)
+
+      setData(prevData => ({
+        ...prevData,
+        slug: newSlug
+      }))
+    } else {
+      setData(prevData => ({
+        ...prevData,
+        slug: ''
+      }))
+    }
+  }, [data?.title, setData])
 
   return (
     <>

@@ -97,12 +97,12 @@ const ProjectForm = ({ id }) => {
 
   const fields = useMemo(
     () => [
-      { name: 'title', label: 'Title', placeholder: 'Title', size: 12, required: true },
-      { name: 'slug', label: 'Slug', placeholder: 'slug', size: 12, required: true },
-      { name: 'location', label: 'Location', placeholder: 'Location', size: 12 },
+      { name: 'title', label: 'Title', placeholder: 'Title', size: 6, required: true },
+      { name: 'slug', label: 'Slug', placeholder: 'slug', size: 6, required: true },
+      { name: 'location', label: 'Location', placeholder: 'Location', size: 6 },
       { name: 'description', label: 'Description', placeholder: 'Description', size: 12, multiline: true, rows: 4 },
-      { name: 'meta_title', label: 'Meta Title', placeholder: 'Meta Title', size: 12 },
-      { name: 'meta_keywords', label: 'Meta Keywords', placeholder: 'keyword1, keyword2, keyword3', size: 12 },
+      { name: 'meta_title', label: 'Meta Title', placeholder: 'Meta Title', size: 6 },
+      { name: 'meta_keywords', label: 'Meta Keywords', placeholder: 'keyword1, keyword2, keyword3', size: 6 },
       {
         name: 'meta_description',
         label: 'Meta Description',
@@ -237,16 +237,15 @@ const ProjectForm = ({ id }) => {
           <CardContent>
             <Grid container spacing={5}>
               {fields.map(field => (
-                <Grid item xs={12} sm={12} key={field.name}>
-                  <CustomTextField
-                    {...field}
-                    type={field.type || 'text'}
-                    value={data[field.name] || ''}
-                    onChange={handleChange}
-                    fullWidth
-                    inputProps={field.type === 'number' ? { min: 1 } : {}}
-                  />
-                </Grid>
+                <CustomTextField
+                  {...field}
+                  key={field.name}
+                  type={field.type || 'text'}
+                  value={data[field.name] || ''}
+                  onChange={handleChange}
+                  fullWidth
+                  inputProps={field.type === 'number' ? { min: 1 } : {}}
+                />
               ))}
               <Grid item xs={12} sm={6}>
                 <FormControlLabel

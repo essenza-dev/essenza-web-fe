@@ -230,8 +230,14 @@ const ArticlePage = () => {
         header: 'Author',
         cell: info => <Typography className='truncate max-w-[200px]'>{info.getValue()}</Typography>
       }),
-      columnHelper.accessor('published_at', {
-        header: 'Publish at',
+      columnHelper.accessor('created_at', {
+        header: 'Created at',
+        cell: info => (
+          <Typography className='truncate max-w-[200px]'>{formatDateToCustomStringNative(info.getValue())}</Typography>
+        )
+      }),
+      columnHelper.accessor('updated_at', {
+        header: 'Updated at',
         cell: info => (
           <Typography className='truncate max-w-[200px]'>{formatDateToCustomStringNative(info.getValue())}</Typography>
         )

@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 import { Box, Typography, Grid, Card } from '@mui/material'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Autoplay } from 'swiper/modules'
@@ -171,14 +173,16 @@ const CardCarousel = props => {
                 {data.map((item, i) => (
                   <SwiperSlide key={i}>
                     <Grid key={item.id} item xs={6} sm={6} lg={4}>
-                      <Card sx={styles.cardWrapper}>
-                        <Box sx={styles.imageWrapper}>
-                          <img src={item.src} alt={item.title} />
-                        </Box>
-                        <Typography sx={styles.cardLabel}>
-                          {item.title} <span>Series</span>
-                        </Typography>
-                      </Card>
+                      <Link href={item?.href || '#'}>
+                        <Card sx={styles.cardWrapper}>
+                          <Box sx={styles.imageWrapper}>
+                            <img src={item.src} alt={item.title} />
+                          </Box>
+                          <Typography sx={styles.cardLabel}>
+                            {item.title} <span>Series</span>
+                          </Typography>
+                        </Card>
+                      </Link>
                     </Grid>
                   </SwiperSlide>
                 ))}
@@ -188,8 +192,10 @@ const CardCarousel = props => {
             <>
               {data.map((img, i) => (
                 <SwiperSlide key={i}>
-                  <Box component='img' src={img.src} alt={`Banner ${img.src}`} sx={styles.bannerImage} />
-                  <Typography sx={styles.descriptionBanner}>{img.title}</Typography>
+                  <Link href={img?.href || '#'}>
+                    <Box component='img' src={img.src} alt={img.title} sx={styles.bannerImage} />
+                    <Typography sx={styles.descriptionBanner}>{img.title}</Typography>
+                  </Link>
                 </SwiperSlide>
               ))}
             </>

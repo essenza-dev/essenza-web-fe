@@ -24,4 +24,12 @@ const deleteArticle = async id => {
   return await apiClient.delete(`/int/v1/articles/${id}`)
 }
 
-export { getArticles, getArticleById, createArticle, updateArticle, deleteArticle }
+const getPubArticles = async (params = {}) => {
+  return await apiClient.get('/pub/v1/articles', { params })
+}
+
+const getPubArticleBySlug = async slug => {
+  return await apiClient.get(`/int/v1/articles/${slug}`)
+}
+
+export { getArticles, getArticleById, createArticle, updateArticle, deleteArticle, getPubArticles, getPubArticleBySlug }
