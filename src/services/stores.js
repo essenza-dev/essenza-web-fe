@@ -24,4 +24,8 @@ const deleteStore = async id => {
   return await apiClient.delete(`/int/v1/stores/${id}`)
 }
 
-export { getStores, getStoreById, createStore, updateStore, deleteStore }
+const getPubStores = async (params = {}) => {
+  return await apiClient.get(`/pub/v1/stores`, { params })
+}
+
+export { getStores, getStoreById, createStore, updateStore, deleteStore, getPubStores }

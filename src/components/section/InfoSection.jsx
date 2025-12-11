@@ -1,6 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
+import Link from 'next/link'
 
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
@@ -16,59 +18,8 @@ import Fade from '@mui/material/Fade'
 import CustomButton from '@/@core/components/mui/Button'
 
 import frontCommonStyles from '@views/front-pages/styles.module.css'
-
-const companyData = [
-  {
-    id: 1,
-    name: 'PT DIMENSI PROCIPTA INDONESIA (DP HAUS)',
-    location: 'Panglima Polim Raya 107B Jakarta Selatan',
-    phone: '(021) 7399606',
-    actionButtons: [
-      { text: 'View Location', type: 'location' },
-      { text: 'Contact Us', type: 'contact' }
-    ]
-  },
-  {
-    id: 2,
-    name: 'PT ALAS MULIA',
-    location: 'Jl. Otto Iskandar Dinata No. 357 Bandung',
-    phone: '(022) 4208111',
-    actionButtons: [
-      { text: 'View Location', type: 'location' },
-      { text: 'Contact Us', type: 'contact' }
-    ]
-  },
-  {
-    id: 3,
-    name: 'PT GRAHA PELANGI JAYA',
-    location: 'Perkantoran THD Blok A No. 25 Semarang',
-    phone: '(024) -3553001',
-    actionButtons: [
-      { text: 'View Location', type: 'location' },
-      { text: 'Contact Us', type: 'contact' }
-    ]
-  },
-  {
-    id: 4,
-    name: 'PT BERKAT PUTRA BUANA',
-    location: 'Jalan Baliwerti 55 Surabaya',
-    phone: '(031) 5350519',
-    actionButtons: [
-      { text: 'View Location', type: 'location' },
-      { text: 'Contact Us', type: 'contact' }
-    ]
-  },
-  {
-    id: 5,
-    name: 'PT. GADING MAS MULTI PRIMA',
-    location: 'Jl. Taman Griya Pratama Blok 7 No. 41 Pegangsaan Dua Kelapa Gading Jakarta Utara',
-    phone: '(021) 22468888',
-    actionButtons: [
-      { text: 'View Location', type: 'location' },
-      { text: 'Contact Us', type: 'contact' }
-    ]
-  }
-]
+import { getPubStores } from '@/services/stores'
+import { getPubDistributors } from '@/services/distributors'
 
 const storeData = [
   {
@@ -259,7 +210,9 @@ const BoxItem = ({ data }) => {
               <CustomButton>View Location</CustomButton>
             </Grid>
             <Grid item sm={6} xs={6}>
-              <CustomButton>Contact Us</CustomButton>
+              <Link href={`tel:${data?.phone}`}>
+                <CustomButton>Contact Us</CustomButton>
+              </Link>
             </Grid>
           </Grid>
         </Grid>
@@ -274,6 +227,8 @@ const InfoSection = () => {
   const [selectedInfo, setSelectedInfo] = useState('distributor')
   const [selectedLocation, setSelectedLocation] = useState('')
   const [showLocation, setShowLocation] = useState(null)
+  const [distributors, setDistributors] = useState([])
+  const [stores, setStores] = useState([])
   const open = Boolean(showLocation)
 
   const filteredStores = storeData.find(data => data.city === selectedLocation)?.companies || []
@@ -290,6 +245,34 @@ const InfoSection = () => {
     setSelectedInfo(info)
     setSelectedLocation('')
   }
+
+  const fetchStores = async () => {
+    const res = await getPubStores()
+
+    console.log('res', res)
+  }
+
+  const fetchDistributors = async () => {
+    const res = await getPubDistributors()
+
+    if (res?.data?.length > 0) {
+      const mapoingDistributors = res?.data.map(item => {
+        return {
+          ...item,
+          location: item?.address
+        }
+      })
+
+      setDistributors(mapoingDistributors)
+    }
+
+    console.log('res', res)
+  }
+
+  useEffect(() => {
+    fetchStores()
+    fetchDistributors()
+  }, [])
 
   return (
     <Container maxWidth='lg' sx={styles.container} className={frontCommonStyles.layoutSpacing}>
@@ -312,7 +295,7 @@ const InfoSection = () => {
       <Grid container spacing={3} mt={3}>
         {selectedInfo === 'distributor' && (
           <>
-            {companyData.map(data => (
+            {distributors.map(data => (
               <Grid item sm={12} key={data?.id}>
                 <BoxItem data={data} />
               </Grid>

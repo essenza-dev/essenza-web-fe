@@ -20,4 +20,15 @@ const deleteDistributor = async id => {
   return await apiClient.delete(`/int/v1/distributors/${id}`)
 }
 
-export { getDistributors, getDistributorById, createDistributor, updateDistributor, deleteDistributor }
+const getPubDistributors = async (params = {}) => {
+  return await apiClient.get('/pub/v1/distributors', { params })
+}
+
+export {
+  getDistributors,
+  getDistributorById,
+  createDistributor,
+  updateDistributor,
+  deleteDistributor,
+  getPubDistributors
+}
