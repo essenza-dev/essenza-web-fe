@@ -3,11 +3,6 @@
 const nextConfig = {
   basePath: process.env.BASEPATH,
 
-  // i18n: {
-  //   locales: ['id', 'en'],
-  //   defaultLocale: 'id',
-  //   localeDetection: false
-  // },
   redirects: async () => {
     return [
       {

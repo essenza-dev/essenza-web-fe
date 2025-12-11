@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
@@ -9,32 +9,40 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 
-// Third-party Imports
 import classnames from 'classnames'
 
-// Component Imports
+import { GoogleReCaptchaProvider, GoogleReCaptcha } from 'react-google-recaptcha-v3'
+
+import { CircularProgress } from '@mui/material'
+
 import Link from '@components/Link'
 
-// Styles Imports
 import frontCommonStyles from '@views/front-pages/styles.module.css'
 import CustomButton from '@/@core/components/mui/Button'
 import { getPubSocialMedias, getSocialMedias } from '@/services/socialMedia'
+import { subscribeUser } from '@/services/subscribe'
 
 const styles = {
   subscribePlaceholder: {
     '& .MuiOutlinedInput-input::placeholder': {
-      color: '#757575',
+      color: '#757575 !important',
       fontSize: '13px',
       opacity: 1
     },
     '& .MuiOutlinedInput-root': {
       '& fieldset': {
-        borderColor: '#757575'
+        borderColor: '#757575 !important'
       },
       '& .MuiInputBase-input': {
         padding: '6.5px 14px'
       }
     }
+  },
+  buttonSubcribe: {
+    fontSize: '12px',
+    textTransform: 'capitalize',
+    height: '34px',
+    backgroundColor: '#BB8B05 !important'
   },
   dividerFullWidth: {
     borderBottomWidth: 'inherit',
@@ -109,43 +117,98 @@ const footerSections = [
 ]
 
 const SubcribesFooter = ({ socialMedia }) => {
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [token, setToken] = useState()
+  const [refreshReCaptcha, setRefreshReCaptcha] = useState(false)
+
+  const onVerify = useCallback(token => {
+    setToken(token)
+  }, [])
+
+  const handleEmailChange = useCallback(e => {
+    setEmail(e.target.value)
+  }, [])
+
+  const handleSubscribe = useCallback(async () => {
+    setLoading(true)
+
+    try {
+      const data = {
+        captcha_token: token,
+        captcha_version: 'v3',
+        email: email
+      }
+
+      const result = await subscribeUser(data)
+
+      console.log('result', result)
+
+      if (result.success) {
+        alert('Terima kasih! Langganan berhasil.')
+        setEmail('')
+      } else {
+        alert(result.message || 'Gagal berlangganan. Coba lagi.')
+      }
+    } catch (error) {
+      console.error('Subscription Error:', error)
+      alert('Terjadi kesalahan sistem. Coba lagi nanti.')
+    } finally {
+      setLoading(false)
+      setRefreshReCaptcha(r => !r)
+    }
+  }, [email])
+
   return (
     <>
-      <Typography sx={styles.textSubcribe}>Enter your email to receive news, information about essenza</Typography>
-      <Grid container spacing={2} mt={2}>
-        <Grid item xs={9}>
-          <TextField
-            className='w-full rounded-[6px]'
-            size='small'
-            placeholder='Input your email address'
-            variant='outlined'
-            sx={styles.subscribePlaceholder}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={3}>
-          <Button variant='contained' className='w-full text-[#FFFFFF] rounded-[6px]' size='small' fullWidth>
-            Submit
-          </Button>
-        </Grid>
-      </Grid>
-      <Divider sx={styles.dividerMobileOnly} className='border-t border-[#212121]' />
-      <Grid container spacing={2}>
-        <Grid item>
-          <Typography className='text-[#212121] font-weigth-400 text-md'>Follow Us :</Typography>
-        </Grid>
-        {socialMedia.map(social => (
-          <Grid item key={social.id}>
-            <a href={social?.href || '#'} target='_blank'>
-              <img className='h-[26px]' src={social.icon} />
-            </a>
+      <GoogleReCaptchaProvider reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}>
+        <Typography sx={styles.textSubcribe}>Enter your email to receive news, information about essenza</Typography>
+        <Grid container spacing={2} mt={2}>
+          <Grid item xs={9}>
+            <TextField
+              className='w-full rounded-[6px]'
+              size='small'
+              placeholder='Input your email address'
+              variant='outlined'
+              sx={styles.subscribePlaceholder}
+              value={email}
+              onChange={handleEmailChange}
+              fullWidth
+            />
           </Grid>
-        ))}
-      </Grid>
-      <Divider
-        sx={{ ...styles.dividerFullWidth, display: { sm: 'none' } }}
-        className='border-t border-[#212121] mt-6 mb-3'
-      />
+          <Grid item xs={3}>
+            <GoogleReCaptcha onVerify={onVerify} refreshReCaptcha={refreshReCaptcha} />
+            <Button
+              sx={styles.buttonSubcribe}
+              variant='contained'
+              className='w-full text-[#FFFFFF] rounded-[6px]'
+              size='small'
+              fullWidth
+              onClick={handleSubscribe}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={20} sx={{ color: '#2b2b2b' }} /> : 'Submit'}
+            </Button>
+          </Grid>
+        </Grid>
+        <Divider sx={styles.dividerMobileOnly} className='border-t border-[#212121]' />
+        <Grid container spacing={2}>
+          <Grid item>
+            <Typography className='text-[#212121] font-weigth-400 text-md'>Follow Us :</Typography>
+          </Grid>
+          {socialMedia.map(social => (
+            <Grid item key={social.id}>
+              <a href={social?.href || '#'} target='_blank'>
+                <img className='h-[26px]' src={social.icon} />
+              </a>
+            </Grid>
+          ))}
+        </Grid>
+        <Divider
+          sx={{ ...styles.dividerFullWidth, display: { sm: 'none' } }}
+          className='border-t border-[#212121] mt-6 mb-3'
+        />
+      </GoogleReCaptchaProvider>
     </>
   )
 }
