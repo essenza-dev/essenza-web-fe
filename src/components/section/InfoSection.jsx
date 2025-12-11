@@ -248,8 +248,6 @@ const InfoSection = () => {
 
   const fetchStores = async () => {
     const res = await getPubStores()
-
-    console.log('res', res)
   }
 
   const fetchDistributors = async () => {
@@ -265,8 +263,6 @@ const InfoSection = () => {
 
       setDistributors(mapoingDistributors)
     }
-
-    console.log('res', res)
   }
 
   useEffect(() => {

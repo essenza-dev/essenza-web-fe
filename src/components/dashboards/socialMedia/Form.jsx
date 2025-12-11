@@ -198,8 +198,14 @@ const SocialMediaForm = () => {
   }
 
   const onSave = async index => {
-    const item = socialMedia[index]
+    const item = {
+      ...socialMedia[index],
+      id: socialMedia[index]?.id || 0,
+      order_no: socialMedia[index]?.order_no || 0,
+      icon: socialMedia[index]?.platform.toLowerCase()
+    }
 
+    console.log('item save', item)
     setLoading(true)
 
     try {

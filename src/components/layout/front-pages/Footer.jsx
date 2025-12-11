@@ -1,4 +1,7 @@
-// MUI Imports
+'use client'
+
+import { useEffect, useState } from 'react'
+
 import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
@@ -15,6 +18,7 @@ import Link from '@components/Link'
 // Styles Imports
 import frontCommonStyles from '@views/front-pages/styles.module.css'
 import CustomButton from '@/@core/components/mui/Button'
+import { getPubSocialMedias, getSocialMedias } from '@/services/socialMedia'
 
 const styles = {
   subscribePlaceholder: {
@@ -104,13 +108,7 @@ const footerSections = [
   }
 ]
 
-const socialMedia = [
-  { id: 'instagram', icon: '/icons/instagram.svg', href: '' },
-  { id: 'facebook', icon: '/icons/facebook.svg', href: '' },
-  { id: 'youtube', icon: '/icons/youtube.svg', href: '' }
-]
-
-const SubcribesFooter = () => {
+const SubcribesFooter = ({ socialMedia }) => {
   return (
     <>
       <Typography sx={styles.textSubcribe}>Enter your email to receive news, information about essenza</Typography>
@@ -138,7 +136,9 @@ const SubcribesFooter = () => {
         </Grid>
         {socialMedia.map(social => (
           <Grid item key={social.id}>
-            <img className='h-[26px]' src={social.icon} />
+            <a href={social?.href || '#'} target='_blank'>
+              <img className='h-[26px]' src={social.icon} />
+            </a>
           </Grid>
         ))}
       </Grid>
@@ -150,7 +150,7 @@ const SubcribesFooter = () => {
   )
 }
 
-const Footer = () => {
+const Footer = ({ initialSocialMedia }) => {
   return (
     <footer className='bg-white border-t border-[#D1D1D1]'>
       <div className={classnames('pb-6', frontCommonStyles.layoutSpacing)}>
@@ -183,7 +183,7 @@ const Footer = () => {
 
               {/* Mobile Subscribe */}
               <Box sx={styles.subscribeMobileWrapper}>
-                <SubcribesFooter />
+                <SubcribesFooter socialMedia={initialSocialMedia} />
               </Box>
 
               {/* Footer Links */}
@@ -214,7 +214,7 @@ const Footer = () => {
 
             {/* Desktop Subscribe */}
             <Box sx={styles.subscribeDesktopWrapper}>
-              <SubcribesFooter />
+              <SubcribesFooter socialMedia={initialSocialMedia} />
             </Box>
           </Grid>
         </Grid>

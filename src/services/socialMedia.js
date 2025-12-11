@@ -20,4 +20,15 @@ const deleteSocialMedia = async id => {
   return await apiClient.delete(`/int/v1/social-media/${id}`)
 }
 
-export { getSocialMedias, createSocialMedia, getSocialMediaById, updateSocialMedia, deleteSocialMedia }
+const getPubSocialMedias = async (params = {}) => {
+  return await apiClient.get('/pub/v1/social-media', { params })
+}
+
+export {
+  getSocialMedias,
+  createSocialMedia,
+  getSocialMediaById,
+  updateSocialMedia,
+  deleteSocialMedia,
+  getPubSocialMedias
+}
