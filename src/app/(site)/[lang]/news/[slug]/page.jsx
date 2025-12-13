@@ -1,6 +1,6 @@
-import { notFound } from 'next/navigation'
-
-import { getPubArticleBySlug } from '@/services/article'
+import EndSection from '@/components/section/EndSection'
+import HeaderNewsDetailSection from '@/components/section/HeaderNewsDetailSection'
+import NewsDetailSection from '@/components/section/NewsDetailSection'
 
 async function getData(slug) {
   const url = `https://essenza-backend.warawiri.web.id/pub/v1/articles${slug}`
@@ -47,13 +47,10 @@ export default async function NewsDetailPage({ params }) {
 
   const newsItem = await getData(slug)
 
-  console.log('res', newsItem)
-
   return (
-    <div className='container mx-auto py-10'>
-      <h1>{newsItem?.title}</h1>
-      <p>Slug: {newsItem?.slug}</p>
-      {newsItem?.content && <div dangerouslySetInnerHTML={{ __html: newsItem?.content }} />}
-    </div>
+    <>
+      <HeaderNewsDetailSection thumbnail={newsItem?.thumbnail ?? '/images/illustrations/photos/banner-1.png'} />
+      <NewsDetailSection data={newsItem} />
+    </>
   )
 }

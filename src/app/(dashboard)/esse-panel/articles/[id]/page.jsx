@@ -17,7 +17,7 @@ import useSnackbar from '@/@core/hooks/useSnackbar'
 
 import { getArticleById, deleteArticle } from '@/services/article'
 
-import { formatDateToCustomStringNative } from '@/utils/helpers'
+import { convertStringtoArray, formatDateToCustomStringNative } from '@/utils/helpers'
 
 import DetailField from '@/components/DetailField'
 import DetailActions from '@/components/DetailActions'
@@ -48,21 +48,6 @@ const ArticleDetailPage = () => {
 
     if (id) fetchArticle()
   }, [id])
-
-  const convertStringtoArray = rawValue => {
-    let tags = []
-
-    if (typeof rawValue === 'string' && rawValue.trim() !== '') {
-      tags = rawValue
-        .split(',')
-        .map(tag => tag.trim())
-        .filter(tag => tag.length > 0)
-    } else if (Array.isArray(rawValue)) {
-      tags = rawValue
-    }
-
-    return tags
-  }
 
   const handleDelete = useCallback(async () => {
     setLoading(true)
