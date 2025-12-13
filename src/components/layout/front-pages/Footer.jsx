@@ -197,7 +197,7 @@ const SubcribesFooter = ({ socialMedia }) => {
             <Typography className='text-[#212121] font-weigth-400 text-md'>Follow Us :</Typography>
           </Grid>
           {socialMedia.map(social => (
-            <Grid item key={social.id}>
+            <Grid item key={social.href}>
               <a href={social?.href || '#'} target='_blank'>
                 <img className='h-[26px]' src={social.icon} />
               </a>
@@ -254,7 +254,7 @@ const Footer = ({ initialSocialMedia }) => {
                 {footerSections.map(section => (
                   <Grid key={section.sectionId} item xs={6} sm={6} lg={2.5}>
                     {section.links.map(link => (
-                      <a key={link.id} href={link.href} className='text-sm hover:underline'>
+                      <a key={link.href} href={link.href} className='text-sm hover:underline'>
                         <Typography className='text-[#212121] mt-3 font-weigth-400 text-xs'>{link.label}</Typography>
                       </a>
                     ))}

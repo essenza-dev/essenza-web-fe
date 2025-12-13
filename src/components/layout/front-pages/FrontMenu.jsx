@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 
 // Next Imports
 import { useParams } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 
 // MUI Imports
@@ -76,6 +77,14 @@ const styles = {
       marginTop: '18px',
       width: 'fit-content'
     }
+  },
+  menu: {},
+  activeMenu: {
+    position: 'relative',
+    bottom: '-0.3rem',
+    paddingBottom: 2,
+    borderBottom: '1.5px solid #BD8100',
+    transition: 'border-bottom 0.3s ease-out, bottom 0.3s ease-out'
   }
 }
 
@@ -111,6 +120,8 @@ const FrontMenu = props => {
   const { isDrawerOpen, setIsDrawerOpen } = props
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
+  const pathname = usePathname()
+
   const handleClickSearch = () => {
     setIsSearchOpen(!isSearchOpen)
   }
@@ -134,9 +145,11 @@ const FrontMenu = props => {
           <SearchBar checked={true} locale={locale} isMobile={true} />
         </Box>
         {staticMenu.map((menu, i) => (
-          <Typography key={i} component={Link} href={`/${locale}${menu.href}`} className={'text-[#212121]'}>
-            {menu.label}
-          </Typography>
+          <Box key={i} sx={pathname === `/${locale}${menu.href}` ? styles.activeMenu : styles.menu}>
+            <Typography component={Link} href={`/${locale}${menu.href}`} className={'text-[#212121]'}>
+              {menu.label}
+            </Typography>
+          </Box>
         ))}
         <Typography
           component={Link}

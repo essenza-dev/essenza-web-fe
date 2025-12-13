@@ -23,12 +23,13 @@ export const metadata = {
   description: 'Essenza - '
 }
 
-const Layout = ({ children }) => {
+const Layout = ({ children, params }) => {
   // Vars
   const systemMode = getSystemMode()
+  const { lang } = params
 
   return (
-    <html id='__next'>
+    <html id='__next' lang={lang} dir='ltr'>
       <body className='flex is-full min-bs-full flex-auto flex-col'>
         <Providers direction='ltr'>
           <BlankLayout systemMode={systemMode}>
